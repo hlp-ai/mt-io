@@ -1,9 +1,8 @@
 import tensorflow as tf
-from tensorflow_asr.augmentations.methods.base_method import AugmentationMethod
 from tensorflow_asr.utils import shape_util
 
 
-class FreqMasking(AugmentationMethod):
+class FreqMasking(object):
     def __init__(self, num_masks: int = 1, mask_factor: float = 27):
         self.num_masks = num_masks
         self.mask_factor = mask_factor
@@ -34,7 +33,7 @@ class FreqMasking(AugmentationMethod):
         return spectrogram
 
 
-class TimeMasking(AugmentationMethod):
+class TimeMasking(object):
     def __init__(self, num_masks: int = 1, mask_factor: float = 100, p_upperbound: float = 1.0):
         self.num_masks = num_masks
         self.mask_factor = mask_factor

@@ -1,5 +1,5 @@
 import tensorflow as tf
-from tensorflow_asr.augmentations.methods import specaugment
+from tensorflow_asr.augmentations import specaugment
 
 AUGMENTATIONS = {
     "freq_masking": specaugment.FreqMasking,
