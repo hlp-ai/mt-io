@@ -6,7 +6,6 @@ import tensorflow as tf
 import tqdm
 
 from tensorflow_asr.augmentations.augmentation import Augmentation
-from tensorflow_asr.datasets.base_dataset import AUTOTUNE, BUFFER_SIZE, TFRECORD_SHARDS, BaseDataset
 from tensorflow_asr.featurizers.speech_featurizers import (
     SpeechFeaturizer,
     load_and_convert_to_wav,
@@ -16,10 +15,14 @@ from tensorflow_asr.featurizers.speech_featurizers import (
 from tensorflow_asr.featurizers.text_featurizers import TextFeaturizer
 from tensorflow_asr.utils import data_util, feature_util, file_util, math_util
 
+BUFFER_SIZE = 100
+TFRECORD_SHARDS = 16
+AUTOTUNE = tf.data.experimental.AUTOTUNE
+
 logger = tf.get_logger()
 
 
-class ASRDataset(BaseDataset):
+class ASRDataset(object):
     """Dataset for ASR using Generator"""
 
     def __init__(
@@ -37,17 +40,21 @@ class ASRDataset(BaseDataset):
         buffer_size: int = BUFFER_SIZE,
         **kwargs,
     ):
-        super().__init__(
-            data_paths=data_paths,
-            augmentations=augmentations,
-            cache=cache,
-            shuffle=shuffle,
-            stage=stage,
-            buffer_size=buffer_size,
-            drop_remainder=drop_remainder,
-            use_tf=use_tf,
-            indefinite=indefinite,
-        )
+        self.data_paths = data_paths or []
+        if not isinstance(self.data_paths, list):
+            raise ValueError("data_paths must be a list of string paths")
+        self.augmentations = augmentations  # apply augmentation
+        self.cache = cache  # whether to cache transformed dataset to memory
+        self.shuffle = shuffle  # whether to shuffle tf.data.Dataset
+        if buffer_size <= 0 and shuffle:
+            raise ValueError("buffer_size must be positive when shuffle is on")
+        self.buffer_size = buffer_size  # shuffle buffer size
+        self.stage = stage  # for defining tfrecords files
+        self.use_tf = use_tf
+        self.drop_remainder = drop_remainder  # whether to drop remainder for multi gpu training
+        self.indefinite = indefinite  # Whether to make dataset repeat indefinitely -> avoid the potential last partial batch
+        self.total_steps = None  # for better training visualization
+
         self.speech_featurizer = speech_featurizer
         self.text_featurizer = text_featurizer
 
