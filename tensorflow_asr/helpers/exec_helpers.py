@@ -22,12 +22,12 @@ def run_testing(
             results = model.predict(test_data_loader, verbose=1)
             logger.info(f"Saving result to {output} ...")
             with open(filepath, "w") as openfile:
-                openfile.write("PATH\tDURATION\tGROUNDTRUTH\tGREEDY\tBEAMSEARCH\n")
+                openfile.write("PATH\tDURATION\tGROUNDTRUTH\tGREEDY\n")
                 progbar = tqdm(total=test_dataset.total_steps, unit="batch")
                 for i, pred in enumerate(results):
                     groundtruth, greedy, beamsearch = [x.decode("utf-8") for x in pred]
                     path, duration, _ = test_dataset.entries[i]
-                    openfile.write(f"{path}\t{duration}\t{groundtruth}\t{greedy}\t{beamsearch}\n")
+                    openfile.write(f"{path}\t{duration}\t{groundtruth}\t{greedy}\n")
                     progbar.update(1)
                 progbar.close()
         app_util.evaluate_results(filepath)
