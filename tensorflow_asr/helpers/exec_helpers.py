@@ -25,7 +25,7 @@ def run_testing(
                 openfile.write("PATH\tDURATION\tGROUNDTRUTH\tGREEDY\n")
                 progbar = tqdm(total=test_dataset.total_steps, unit="batch")
                 for i, pred in enumerate(results):
-                    groundtruth, greedy, beamsearch = [x.decode("utf-8") for x in pred]
+                    groundtruth, greedy = [x.decode("utf-8") for x in pred]
                     path, duration, _ = test_dataset.entries[i]
                     openfile.write(f"{path}\t{duration}\t{groundtruth}\t{greedy}\n")
                     progbar.update(1)
