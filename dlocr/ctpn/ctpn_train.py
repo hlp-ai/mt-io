@@ -28,10 +28,6 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
-
     config = CTPN.load_config(args.config_file_path)
 
     weights_file_path = args.weights_file_path
