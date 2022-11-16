@@ -1,7 +1,6 @@
 import os
 
 from dlocr.densenet.core import DenseNetOCR
-from dlocr.densenet.data_loader import load_dict
 
 default_densenet_weight_path = os.path.join(os.getcwd(), os.path.dirname(__file__),
                                             "../weights/weights-densent-init.hdf5")

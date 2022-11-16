@@ -10,7 +10,6 @@ from tensorflow.keras import Model
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import Conv2D, Lambda, Bidirectional, GRU, Activation
 from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.utils import multi_gpu_model
 
 from dlocr.ctpn.lib import utils
 from dlocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
@@ -137,8 +136,6 @@ class CTPN:
         train_model = Model(input, [cls, regr])
 
         parallel_model = train_model
-        if self.num_gpu > 1:
-            parallel_model = multi_gpu_model(train_model, gpus=self.num_gpu)
 
         adam = Adam(self.lr)
         parallel_model.compile(optimizer=adam,

@@ -23,11 +23,6 @@ if __name__ == '__main__':
 
     ctpn = get_or_create(config_path, weight_path)
 
-    if weight_path is not None:
-        ctpn = get_or_create(config_path, weight_path)
-    else:
-        ctpn = get_or_create(config_path)
-
     start_time = time.time()
     ctpn.predict(image_path, output_path=output_file_path)
     print("cost ", (time.time() - start_time) * 1000, " ms")

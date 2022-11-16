@@ -11,7 +11,6 @@ from PIL import Image
 
 from dlocr.ctpn import CTPN
 from dlocr.densenet import DenseNetOCR
-from dlocr.densenet import load_dict
 
 
 def dumpRotateImage(img, degree, pt1, pt2, pt3, pt4):
