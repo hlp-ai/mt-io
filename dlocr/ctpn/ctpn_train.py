@@ -1,6 +1,5 @@
 import os
 
-import tensorflow as tf
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
 from dlocr.ctpn import CTPN
