@@ -32,9 +32,9 @@ class DataLoader:
                 self.__data_queue.append(data)
 
     def __single_sample(self, xml_path):
-        gtbox, imgfile = readxml(xml_path)  # gtbox: (x1,y1,x2,y2), (leftbottom, topright)
+        gtboxes, imgfile = readxml(xml_path)  # gtbox: (x1,y1,x2,y2), (leftbottom, topright)
         img = cv2.imread(os.path.join(self.images_dir, imgfile))
-        return gtbox, imgfile, img
+        return gtboxes, imgfile, img
 
     def load_data(self):
 
@@ -43,19 +43,19 @@ class DataLoader:
             if len(self.__data_queue) == 0:
                 self.__init_queue()
 
-            gtbox, imgfile, img = self.__data_queue.pop(0)
+            gtboxes, imgfile, img = self.__data_queue.pop(0)
             h, w, c = img.shape
 
             # clip image
             if np.random.randint(0, 100) > 50:
                 img = img[:, ::-1, :]  # clip image
                 # clip x
-                newx1 = w - gtbox[:, 2] - 1
-                newx2 = w - gtbox[:, 0] - 1
-                gtbox[:, 0] = newx1
-                gtbox[:, 2] = newx2
+                newx1 = w - gtboxes[:, 2] - 1
+                newx2 = w - gtboxes[:, 0] - 1
+                gtboxes[:, 0] = newx1
+                gtboxes[:, 2] = newx2
 
-            [cls, regr], _ = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtbox)
+            [cls, regr], _ = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtboxes)
             # zero-center by mean pixel
             m_img = img - IMAGE_MEAN
             m_img = np.expand_dims(m_img, axis=0)
