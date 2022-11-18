@@ -2,9 +2,9 @@
 import argparse
 import time
 
-from dlocr import default_dict_path, default_densenet_config_path, default_densenet_weight_path, \
-    default_ctpn_config_path, \
-    default_ctpn_weight_path, TextDetectionApp
+from dlocr.ctpn import default_ctpn_config_path, default_ctpn_weight_path
+from dlocr.densenet import default_dict_path, default_densenet_config_path, default_densenet_weight_path
+from dlocr.text_detection_app import TextDetectionApp
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
