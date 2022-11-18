@@ -1,6 +1,6 @@
-#coding:utf-8
 import numpy as np
 from .text_proposal_graph_builder import TextProposalGraphBuilder
+
 
 class TextProposalConnectorOriented:
     """

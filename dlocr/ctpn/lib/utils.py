@@ -1,12 +1,9 @@
 import numpy as np
 import xmltodict
-import os
 import cv2
 import matplotlib.pyplot as plt
 from glob import glob
 from concurrent.futures import ThreadPoolExecutor
-
-import tensorflow as tf
 
 anchor_scale = 16
 #
@@ -300,46 +297,6 @@ def nms(dets, thresh):
     return keep
 
 
-def gen_sample(xmlpath, imgpath, batchsize=1):
-    """
-    由于图像大小不定，批处理大小只能为1
-    """
-
-    # list xml 
-    xmlfiles = glob(xmlpath + '/*.xml')
-    rd = random_uniform_num(len(xmlfiles))
-    xmlfiles = np.array(xmlfiles)
-
-    while True:
-        shuf = xmlfiles[rd.get(1)]
-        gtbox, imgfile = readxml(shuf[0])
-        img = cv2.imread(imgpath + "\\" + imgfile)
-        h, w, c = img.shape
-
-        # clip image
-        if np.random.randint(0, 100) > 50:
-            img = img[:, ::-1, :]
-            newx1 = w - gtbox[:, 2] - 1
-            newx2 = w - gtbox[:, 0] - 1
-            gtbox[:, 0] = newx1
-            gtbox[:, 2] = newx2
-
-        [cls, regr], _ = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtbox)
-        # zero-center by mean pixel
-        m_img = img - IMAGE_MEAN
-        m_img = np.expand_dims(m_img, axis=0)
-
-        regr = np.hstack([cls.reshape(cls.shape[0], 1), regr])
-
-        #
-        cls = np.expand_dims(cls, axis=0)
-        cls = np.expand_dims(cls, axis=1)
-        # regr = np.expand_dims(regr,axis=1)
-        regr = np.expand_dims(regr, axis=0)
-
-        yield m_img, {'rpn_class_reshape': cls, 'rpn_regress_reshape': regr}
-
-
 def rpn_test():
     xmlpath = 'G:\data\VOCdevkit\VOC2007\Annotations\img_4375.xml'
     imgpath = 'G:\data\VOCdevkit\VOC2007\JPEGImages\img_4375.jpg'
@@ -357,13 +314,3 @@ def rpn_test():
     for i in anchors:
         cv2.rectangle(img, (i[0], i[1]), (i[2], i[3]), (255, 0, 0), 3)
     plt.imshow(img)
-
-# rpn_test()
-# plt.show()
-
-# xmlpath = 'E:\data\VOCdevkit\VOC2007\Annotations'
-# imgpath = 'E:\data\VOCdevkit\VOC2007\JPEGImages'
-# gen1 = gen_sample(xmlpath, imgpath, 3)
-# _, ret = next(gen1)
-# print(ret.get('rpn_class_reshape').shape)
-# print(ret.get('rpn_regress_reshape').shape)

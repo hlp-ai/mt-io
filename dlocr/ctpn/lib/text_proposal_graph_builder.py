@@ -1,6 +1,34 @@
-from .text_connect_cfg import Config as TextLineCfg
-from .other import Graph
 import numpy as np
+
+
+class TextLineCfg:
+    SCALE=600
+    MAX_SCALE=1200
+    TEXT_PROPOSALS_WIDTH=16
+    MIN_NUM_PROPOSALS = 2
+    MIN_RATIO=0.5
+    LINE_MIN_SCORE=0.9
+    MAX_HORIZONTAL_GAP=60
+    TEXT_PROPOSALS_MIN_SCORE=0.7
+    TEXT_PROPOSALS_NMS_THRESH=0.3
+    MIN_V_OVERLAPS=0.6
+    MIN_SIZE_SIM=0.6
+
+
+class Graph:
+    def __init__(self, graph):
+        self.graph=graph
+
+    def sub_graphs_connected(self):
+        sub_graphs=[]
+        for index in range(self.graph.shape[0]):
+            if not self.graph[:, index].any() and self.graph[index, :].any():
+                v=index
+                sub_graphs.append([v])
+                while self.graph[v, :].any():
+                    v=np.where(self.graph[v, :])[0][0]
+                    sub_graphs[-1].append(v)
+        return sub_graphs
 
 
 class TextProposalGraphBuilder:
