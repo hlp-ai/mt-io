@@ -1,13 +1,9 @@
-import os
-
-from keras.callbacks import ModelCheckpoint
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
 from dlocr.ctpn import CTPN
 from dlocr.ctpn import default_ctpn_config_path
 from dlocr.ctpn.data_loader import DataLoader
 from dlocr.custom import SingleModelCK
-from dlocr.custom.callbacks import SGDRScheduler
 
 
 if __name__ == '__main__':
@@ -44,12 +40,6 @@ if __name__ == '__main__':
     earlystop = EarlyStopping(patience=3, monitor='loss')
     # log = TensorBoard(log_dir='logs', histogram_freq=0, batch_size=1, write_graph=True, write_grads=False)
     log = TensorBoard(log_dir="./logs", update_freq=500)
-    # lr_scheduler = SGDRScheduler(min_lr=1e-6, max_lr=1e-4,
-    #                              initial_epoch=args.initial_epoch,
-    #                              steps_per_epoch=data_loader.steps_per_epoch,
-    #                              cycle_length=8,
-    #                              lr_decay=0.5,
-    #                              mult_factor=1.2)
 
     ctpn.train(data_loader.load_data(),
                epochs=args.epochs,
