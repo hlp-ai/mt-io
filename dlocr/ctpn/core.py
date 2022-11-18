@@ -211,13 +211,6 @@ class CTPN:
         elif mode == 2:
             return text, img
 
-    def config(self):
-        return {
-            "image_channels": self.image_channels,
-            "vgg_trainable": self.vgg_trainable,
-            "lr": self.lr
-        }
-
     @staticmethod
     def load_config(config_path):
         with open(config_path, "r") as infile:
