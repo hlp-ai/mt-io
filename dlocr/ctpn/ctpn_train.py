@@ -1,5 +1,6 @@
 import os
 
+from keras.callbacks import ModelCheckpoint
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
 from dlocr.ctpn import CTPN
@@ -38,18 +39,20 @@ if __name__ == '__main__':
 
     data_loader = DataLoader(args.anno_dir, args.images_dir)
 
-    checkpoint = SingleModelCK(save_weigths_file_path, model=ctpn.model, save_weights_only=True, monitor='loss')
+    checkpoint = SingleModelCK(save_weigths_file_path, model=ctpn.train_model, save_weights_only=True, monitor='loss')
+    # checkpoint = ModelCheckpoint(save_weigths_file_path, save_weights_only=True)
     earlystop = EarlyStopping(patience=3, monitor='loss')
     # log = TensorBoard(log_dir='logs', histogram_freq=0, batch_size=1, write_graph=True, write_grads=False)
-    lr_scheduler = SGDRScheduler(min_lr=1e-6, max_lr=1e-4,
-                                 initial_epoch=args.initial_epoch,
-                                 steps_per_epoch=data_loader.steps_per_epoch,
-                                 cycle_length=8,
-                                 lr_decay=0.5,
-                                 mult_factor=1.2)
+    log = TensorBoard(log_dir="./logs", update_freq=500)
+    # lr_scheduler = SGDRScheduler(min_lr=1e-6, max_lr=1e-4,
+    #                              initial_epoch=args.initial_epoch,
+    #                              steps_per_epoch=data_loader.steps_per_epoch,
+    #                              cycle_length=8,
+    #                              lr_decay=0.5,
+    #                              mult_factor=1.2)
 
     ctpn.train(data_loader.load_data(),
                epochs=args.epochs,
                steps_per_epoch=data_loader.steps_per_epoch,
-               callbacks=[checkpoint, earlystop, lr_scheduler],
+               callbacks=[checkpoint, earlystop],
                initial_epoch=args.initial_epoch)

@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import Conv2D, Lambda, Bidirectional, GRU, Activation
-from tensorflow.keras.optimizers import SGD
+from tensorflow.keras.optimizers import Adam
 
 from dlocr.ctpn.lib import utils
 from dlocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
@@ -95,9 +95,9 @@ class CTPN:
         self.vgg_trainable = vgg_trainable
         self.num_gpu = num_gpu
         self.lr = lr
-        self.model, self.parallel_model, self.predict_model = self.__build_model()
+        self.train_model, self.predict_model = self.__build_model()
         if weight_path is not None:
-            self.model.load_weights(weight_path)
+            self.train_model.load_weights(weight_path)
 
     def __build_model(self):
         base_model = VGG16(weights=None, include_top=False, input_shape=self.image_shape)
@@ -135,17 +135,17 @@ class CTPN:
 
         train_model = Model(input, [cls, regr])
 
-        parallel_model = train_model
+        # parallel_model = train_model
 
-        adam = SGD(self.lr)
-        parallel_model.compile(optimizer=adam,
+        adam = Adam(self.lr)
+        train_model.compile(optimizer=adam,
                                loss={'rpn_regress': _rpn_loss_regr, 'rpn_class': _rpn_loss_cls},
                                loss_weights={'rpn_regress': 1.0, 'rpn_class': 1.0})
 
-        return train_model, parallel_model, predict_model
+        return train_model, predict_model
 
     def train(self, train_data_generator, epochs, **kwargs):
-        self.parallel_model.fit_generator(train_data_generator, epochs=epochs, **kwargs)
+        self.train_model.fit_generator(train_data_generator, epochs=epochs, **kwargs)
 
     def predict(self, image, output_path=None, mode=1):
 
