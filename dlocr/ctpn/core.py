@@ -196,12 +196,12 @@ class CTPN:
 
         # text line
         textConn = TextProposalConnectorOriented()
-        text = textConn.get_text_lines(select_anchor, select_score, [h, w])
+        text_rects = textConn.get_text_lines(select_anchor, select_score, [h, w])
 
-        text = text.astype('int32')
+        text_rects = text_rects.astype('int32')
 
         if mode == 1:
-            for i in text:
+            for i in text_rects:
                 draw_rect(i, img)
 
             plt.imshow(img)
@@ -209,7 +209,7 @@ class CTPN:
             if output_path is not None:
                 cv2.imwrite(output_path, img)
         elif mode == 2:
-            return text, img
+            return text_rects, img
 
     @staticmethod
     def load_config(config_path):
