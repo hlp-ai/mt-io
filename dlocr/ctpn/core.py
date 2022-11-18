@@ -9,7 +9,7 @@ import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import Conv2D, Lambda, Bidirectional, GRU, Activation
-from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.optimizers import SGD
 
 from dlocr.ctpn.lib import utils
 from dlocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
@@ -137,7 +137,7 @@ class CTPN:
 
         parallel_model = train_model
 
-        adam = Adam(self.lr)
+        adam = SGD(self.lr)
         parallel_model.compile(optimizer=adam,
                                loss={'rpn_regress': _rpn_loss_regr, 'rpn_class': _rpn_loss_cls},
                                loss_weights={'rpn_regress': 1.0, 'rpn_class': 1.0})
