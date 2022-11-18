@@ -188,11 +188,6 @@ class DenseNetOCR:
         return decode(y_pred, self.num_classes, id_to_char)
 
     @staticmethod
-    def save_config(obj, config_path: str):
-        with open(config_path, 'w+') as outfile:
-            json.dump(obj.config(), outfile)
-
-    @staticmethod
     def load_config(config_path: str):
         with open(config_path, 'r') as infile:
             return dict(json.load(infile))

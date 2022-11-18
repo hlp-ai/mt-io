@@ -219,11 +219,6 @@ class CTPN:
         }
 
     @staticmethod
-    def save_config(obj, config_path):
-        with open(config_path, "w+") as outfile:
-            json.dump(obj.config(), outfile)
-
-    @staticmethod
     def load_config(config_path):
         with open(config_path, "r") as infile:
             return dict(json.load(infile))
