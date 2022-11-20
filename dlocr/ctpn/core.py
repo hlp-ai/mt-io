@@ -171,8 +171,8 @@ class CTPN:
         m_img = np.expand_dims(m_img, axis=0)
 
         cls, regr, cls_prod = self.predict_model.predict_on_batch(m_img)
-        anchor = utils.gen_anchor((int(h / 16), int(w / 16)), 16)
 
+        anchor = utils.gen_anchor((int(h / 16), int(w / 16)), 16)
         bbox = utils.bbox_transfor_inv(anchor, regr)
         bbox = utils.clip_box(bbox, [h, w])
 
