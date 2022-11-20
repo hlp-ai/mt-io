@@ -1,7 +1,5 @@
 import numpy as np
 import xmltodict
-import cv2
-import matplotlib.pyplot as plt
 from concurrent.futures import ThreadPoolExecutor
 
 anchor_scale = 16
@@ -294,22 +292,3 @@ def nms(dets, thresh):
         inds = np.where(ovr <= thresh)[0]
         order = order[inds + 1]
     return keep
-
-
-def rpn_test():
-    xmlpath = 'G:\data\VOCdevkit\VOC2007\Annotations\img_4375.xml'
-    imgpath = 'G:\data\VOCdevkit\VOC2007\JPEGImages\img_4375.jpg'
-    gtbox, _ = readxml(xmlpath)
-    img = cv2.imread(imgpath)
-    h, w, c = img.shape
-    [cls, regr], base_anchor = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtbox)
-    print(cls.shape)
-    print(regr.shape)
-
-    regr = np.expand_dims(regr, axis=0)
-    inv_anchor = bbox_transfor_inv(base_anchor, regr)
-    anchors = inv_anchor[cls == 1]
-    anchors = anchors.astype(int)
-    for i in anchors:
-        cv2.rectangle(img, (i[0], i[1]), (i[2], i[3]), (255, 0, 0), 3)
-    plt.imshow(img)

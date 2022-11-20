@@ -5,7 +5,7 @@ from glob import glob
 import cv2
 import numpy as np
 
-from dlocr.ctpn.lib.utils import random_uniform_num, readxml, cal_rpn, IMAGE_MEAN
+from dlocr.ctpn.lib.utils import random_uniform_num, readxml, cal_rpn, IMAGE_MEAN, bbox_transfor_inv
 
 
 class DataLoader:
@@ -69,3 +69,30 @@ class DataLoader:
             regr = np.expand_dims(regr, axis=0)
 
             yield m_img, {'rpn_class': cls, 'rpn_regress': regr}
+
+
+if __name__ == "__main__":
+    import matplotlib.pyplot as plt
+
+    xmlpath = r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations\img_1001.xml"
+    imgpath = r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages\img_1001.jpg"
+
+    gtbox, _ = readxml(xmlpath)
+    img = cv2.imread(imgpath)
+    h, w, c = img.shape
+    print(h, w)
+
+    [cls, regr], base_anchor = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtbox)
+    print(cls.shape)
+    print(cls[:10])
+    print(regr.shape)
+    print(regr[:10])
+
+    regr = np.expand_dims(regr, axis=0)
+    inv_anchor = bbox_transfor_inv(base_anchor, regr)
+    anchors = inv_anchor[cls == 1]
+    anchors = anchors.astype(int)
+    for i in anchors:
+        cv2.rectangle(img, (i[0], i[1]), (i[2], i[3]), (255, 0, 0), 3)
+    plt.imshow(img)
+    plt.show()
