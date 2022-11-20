@@ -2,11 +2,10 @@ import numpy as np
 import xmltodict
 import cv2
 import matplotlib.pyplot as plt
-from glob import glob
 from concurrent.futures import ThreadPoolExecutor
 
 anchor_scale = 16
-#
+
 IOU_NEGATIVE = 0.3
 IOU_POSITIVE = 0.7
 IOU_SELECT = 0.7
