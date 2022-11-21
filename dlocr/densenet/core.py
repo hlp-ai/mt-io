@@ -108,18 +108,6 @@ class DenseNetOCR:
             print("Loading model from", weight_path)
             self.base_model.load_weights(weight_path)
 
-    def config(self):
-        return {
-            "lr": self.lr,
-            "num_classes": self.num_classes,
-            "image_height": self.image_height,
-            "image_channels": self.image_channels,
-            "maxlen": self.maxlen,
-            "dropout_rate": self.dropout_rate,
-            "weight_decay": self.weight_decay,
-            "filters": self.filters
-        }
-
     def __build_model(self):
         input = Input(shape=self.image_shape, name="the_input")  # （h, w, c）
         nb_filter = self.filters
