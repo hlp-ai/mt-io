@@ -11,6 +11,7 @@ from PIL import Image
 
 from dlocr.ctpn import CTPN
 from dlocr.densenet import DenseNetOCR
+from dlocr.densenet.data_reader import load_dict_sp
 
 
 def dumpRotateImage(img, degree, pt1, pt2, pt3, pt4):
@@ -119,7 +120,7 @@ class TextDetectionApp:
         :param densenet_config_path: Densenet 模型配置文件路径
         """
 
-        self.id_to_char = load_dict(dict_path, encoding="utf-8")
+        self.id_to_char = load_dict_sp(dict_path, encoding="utf-8")
 
         # 初始化CTPN模型
         if ctpn_config_path is not None:
