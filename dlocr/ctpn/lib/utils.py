@@ -40,21 +40,25 @@ def readxml(path):
 
 
 def gen_anchor(featuresize, scale):
-    """
-    gen base anchor from feature map [HXW][10][4]
-    reshape  [HXW][10][4] to [HXWX10][4]
-    生成的锚框是相对于原图的，即原图中每16像素就有10个锚框
+    """生成锚框
+
+    Args:
+        featuresize: 图像特征图大小，shape of (h, w)
+        scale: 图像下采样倍数, 16
+
+    Returns:
+        shape of (h*w*10, 4)
     """
 
     heights = [11, 16, 23, 33, 48, 68, 97, 139, 198, 283]
     widths = [16, 16, 16, 16, 16, 16, 16, 16, 16, 16]
 
-    # gen k=9 anchor size (h,w)
     heights = np.array(heights).reshape(len(heights), 1)
     widths = np.array(widths).reshape(len(widths), 1)
 
     # 锚框大小为16像素
-    base_anchor = np.array([0, 0, 15, 15])
+    base_anchor = np.array([0, 0, 15, 15])  # (xmin, ymin, xmax, ymax)
+
     # center x,y
     xt = (base_anchor[0] + base_anchor[2]) * 0.5
     yt = (base_anchor[1] + base_anchor[3]) * 0.5
@@ -69,13 +73,15 @@ def gen_anchor(featuresize, scale):
     base_anchor = np.hstack((x1, y1, x2, y2))
 
     h, w = featuresize
-    shift_x = np.arange(0, w) * scale
+    shift_x = np.arange(0, w) * scale  # 原始图中x坐标位置点，每隔16个像素一个位置点
     shift_y = np.arange(0, h) * scale
+
     # apply shift
     anchor = []
     for i in shift_y:
         for j in shift_x:
             anchor.append(base_anchor + [j, i, j, i])
+
     return np.array(anchor).reshape((-1, 4))
 
 
@@ -189,17 +195,17 @@ def cal_rpn(imgsize, featuresize, scale, gtboxes):
     base_anchor = gen_anchor(featuresize, scale)  # (Nsample, 4)
 
     # calculate iou
-    overlaps = cal_overlaps(base_anchor, gtboxes)  # (Nsample, Msample)
+    overlaps = cal_overlaps(base_anchor, gtboxes)  # 锚框和真实框的IOU, (Nsample, Msample)
 
     # init labels -1 don't care  0 is negative  1 is positive
     labels = np.empty(base_anchor.shape[0])
     labels.fill(-1)  # (Nsample,)
 
     # for each GT box corresponds to an anchor which has highest IOU
-    gt_argmax_overlaps = overlaps.argmax(axis=0)  # (Msample, )
+    gt_argmax_overlaps = overlaps.argmax(axis=0)  # 和每个真实框IOU最大的锚框, (Msample, )
 
     # the anchor with the highest IOU overlap with a GT box
-    anchor_argmax_overlaps = overlaps.argmax(axis=1)  # (Nsample, )
+    anchor_argmax_overlaps = overlaps.argmax(axis=1)  # 和每个锚框最大的真实框, (Nsample, )
     anchor_max_overlaps = overlaps[range(overlaps.shape[0]), anchor_argmax_overlaps]  # (Nsample, )
 
     # IOU > IOU_POSITIVE
@@ -219,22 +225,20 @@ def cal_rpn(imgsize, featuresize, scale, gtboxes):
     labels[outside_anchor] = -1
 
     # 剔除掉多余的正负样例
-    # subsample positive labels ,if greater than RPN_POSITIVE_NUM(default 128)
+    # subsample positive labels, if greater than RPN_POSITIVE_NUM(default 128)
     fg_index = np.where(labels == 1)[0]
-    if (len(fg_index) > RPN_POSITIVE_NUM):
+    if len(fg_index) > RPN_POSITIVE_NUM:
         labels[np.random.choice(fg_index, len(fg_index) - RPN_POSITIVE_NUM, replace=False)] = -1
 
     # subsample negative labels
     bg_index = np.where(labels == 0)[0]
     num_bg = RPN_TOTAL_NUM - np.sum(labels == 1)
-    if (len(bg_index) > num_bg):
+    if len(bg_index) > num_bg:
         # print('bgindex:',len(bg_index),'num_bg',num_bg)
         labels[np.random.choice(bg_index, len(bg_index) - num_bg, replace=False)] = -1
 
     # calculate bbox targets
-    # debug here 
     bbox_targets = bbox_transfrom(base_anchor, gtboxes[anchor_argmax_overlaps, :])
-    # bbox_targets=[]
 
     return [labels, bbox_targets], base_anchor
 
