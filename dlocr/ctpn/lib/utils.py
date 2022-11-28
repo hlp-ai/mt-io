@@ -191,15 +191,15 @@ def cal_rpn(imgsize, featuresize, scale, gtboxes):
     """
     imgh, imgw = imgsize
 
-    # gen base anchor
+    # 产生候选锚框
     base_anchor = gen_anchor(featuresize, scale)  # (Nsample, 4)
 
-    # calculate iou
+    # 计算每个锚框和每个真实框间的IOU
     overlaps = cal_overlaps(base_anchor, gtboxes)  # 锚框和真实框的IOU, (Nsample, Msample)
 
     # init labels -1 don't care  0 is negative  1 is positive
-    labels = np.empty(base_anchor.shape[0])
-    labels.fill(-1)  # (Nsample,)
+    labels = np.empty(base_anchor.shape[0])  # (Nsample,)
+    labels.fill(-1)
 
     # for each GT box corresponds to an anchor which has highest IOU
     gt_argmax_overlaps = overlaps.argmax(axis=0)  # 和每个真实框IOU最大的锚框, (Msample, )
@@ -237,8 +237,8 @@ def cal_rpn(imgsize, featuresize, scale, gtboxes):
         # print('bgindex:',len(bg_index),'num_bg',num_bg)
         labels[np.random.choice(bg_index, len(bg_index) - num_bg, replace=False)] = -1
 
-    # calculate bbox targets
-    bbox_targets = bbox_transfrom(base_anchor, gtboxes[anchor_argmax_overlaps, :])
+    # 计算锚框、和锚框最大重叠的真实框之间的垂直高度和位置偏差
+    bbox_targets = bbox_transfrom(base_anchor, gtboxes[anchor_argmax_overlaps, :])  # (Nsample, 2)
 
     return [labels, bbox_targets], base_anchor
 

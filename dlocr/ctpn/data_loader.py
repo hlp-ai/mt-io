@@ -46,7 +46,7 @@ class DataLoader:
             gtboxes, imgfile, img = self.__data_queue.pop(0)
             h, w, c = img.shape
 
-            # clip image
+            # 随机水平翻转
             if np.random.randint(0, 100) > 50:
                 img = img[:, ::-1, :]  # clip image
                 # clip x
@@ -55,14 +55,15 @@ class DataLoader:
                 gtboxes[:, 0] = newx1
                 gtboxes[:, 2] = newx2
 
+            # 每个锚框的类别和垂直高度位置偏差
             [cls, regr], _ = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtboxes)
-            # zero-center by mean pixel
+
+            # 规范化图像
             m_img = img - IMAGE_MEAN
             m_img = np.expand_dims(m_img, axis=0)
 
             regr = np.hstack([cls.reshape(cls.shape[0], 1), regr])
 
-            #
             cls = np.expand_dims(cls, axis=0)
             cls = np.expand_dims(cls, axis=1)
             # regr = np.expand_dims(regr,axis=1)
