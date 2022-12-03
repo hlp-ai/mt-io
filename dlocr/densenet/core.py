@@ -174,8 +174,3 @@ class DenseNetOCR:
         y_pred = self.base_model.predict_on_batch(X)
 
         return decode(y_pred, self.num_classes, id_to_char)
-
-    @staticmethod
-    def load_config(config_path: str):
-        with open(config_path, 'r') as infile:
-            return dict(json.load(infile))

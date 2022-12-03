@@ -7,6 +7,7 @@ from dlocr.densenet import DenseNetOCR
 
 from dlocr.densenet import default_densenet_config_path
 from dlocr.densenet.data_reader import OCRDataset
+from dlocr.utils import load_config
 
 if __name__ == '__main__':
     import argparse
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     epochs = args.epochs
     initial_epoch = args.initial_epoch
 
-    config = DenseNetOCR.load_config(args.config_file_path)
+    config = load_config(args.config_file_path)
     weights_file_path = args.weights_file_path
 
     if os.path.exists(weights_file_path):
