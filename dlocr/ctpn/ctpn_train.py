@@ -12,8 +12,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-ie", "--initial_epoch", help="初始迭代数", default=0, type=int)
     parser.add_argument("--epochs", help="迭代数", default=20, type=int)
-    parser.add_argument("--images_dir", help="图像位置", default="E:\data\VOCdevkit\VOC2007\JPEGImages")
-    parser.add_argument("--anno_dir", help="标注文件位置", default="E:\data\VOCdevkit\VOC2007\Annotations")
+    parser.add_argument("--images_dir", help="图像位置", required=True)
+    parser.add_argument("--anno_dir", help="标注文件位置", required=True)
     parser.add_argument("--config_file_path", help="模型配置文件位置",
                         default=default_ctpn_config_path)
     parser.add_argument("--weights_file_path", help="模型初始权重文件位置",
