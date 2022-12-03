@@ -87,6 +87,38 @@ vgg_weights_path = \
                  "../weights/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
 
 
+def post_process(cls_prod, regr, h, w):
+    anchor = utils.gen_anchor((int(h / 16), int(w / 16)), 16)
+    bbox = utils.bbox_transfor_inv(anchor, regr)
+    bbox = utils.clip_box(bbox, [h, w])
+
+    # score > 0.7
+    fg = np.where(cls_prod[0, :, 1] > utils.IOU_SELECT)[0]
+    select_anchor = bbox[fg, :]
+    select_score = cls_prod[0, fg, 1]
+    select_anchor = select_anchor.astype('int32')
+
+    # filter size
+    keep_index = utils.filter_bbox(select_anchor, 16)
+
+    # nsm
+    select_anchor = select_anchor[keep_index]
+    select_score = select_score[keep_index]
+    select_score = np.reshape(select_score, (select_score.shape[0], 1))
+    nmsbox = np.hstack((select_anchor, select_score))
+    keep = utils.nms(nmsbox, 1 - utils.IOU_SELECT)
+    select_anchor = select_anchor[keep]
+    select_score = select_score[keep]
+
+    # text line
+    textConn = TextProposalConnectorOriented()
+    text_rects = textConn.get_text_lines(select_anchor, select_score, [h, w])
+
+    text_rects = text_rects.astype('int32')
+
+    return text_rects
+
+
 class CTPN:
 
     def __init__(self, lr=0.00001, image_channels=3, vgg_trainable=True, weight_path=None, num_gpu=1):
@@ -135,8 +167,6 @@ class CTPN:
 
         train_model = Model(input, [cls, regr])
 
-        # parallel_model = train_model
-
         adam = Adam(self.lr)
         train_model.compile(optimizer=adam,
                                loss={'rpn_regress': _rpn_loss_regr, 'rpn_class': _rpn_loss_cls},
@@ -148,7 +178,6 @@ class CTPN:
         self.train_model.fit_generator(train_data_generator, epochs=epochs, **kwargs)
 
     def predict(self, image, output_path=None, mode=1):
-
         if type(image) == str:
             img = cv2.imdecode(np.fromfile(image, dtype=np.uint8), cv2.IMREAD_COLOR)
         else:
@@ -172,33 +201,7 @@ class CTPN:
 
         cls, regr, cls_prod = self.predict_model.predict_on_batch(m_img)
 
-        anchor = utils.gen_anchor((int(h / 16), int(w / 16)), 16)
-        bbox = utils.bbox_transfor_inv(anchor, regr)
-        bbox = utils.clip_box(bbox, [h, w])
-
-        # score > 0.7
-        fg = np.where(cls_prod[0, :, 1] > utils.IOU_SELECT)[0]
-        select_anchor = bbox[fg, :]
-        select_score = cls_prod[0, fg, 1]
-        select_anchor = select_anchor.astype('int32')
-
-        # filter size
-        keep_index = utils.filter_bbox(select_anchor, 16)
-
-        # nsm
-        select_anchor = select_anchor[keep_index]
-        select_score = select_score[keep_index]
-        select_score = np.reshape(select_score, (select_score.shape[0], 1))
-        nmsbox = np.hstack((select_anchor, select_score))
-        keep = utils.nms(nmsbox, 1 - utils.IOU_SELECT)
-        select_anchor = select_anchor[keep]
-        select_score = select_score[keep]
-
-        # text line
-        textConn = TextProposalConnectorOriented()
-        text_rects = textConn.get_text_lines(select_anchor, select_score, [h, w])
-
-        text_rects = text_rects.astype('int32')
+        text_rects = post_process(cls_prod, regr, h, w)
 
         if mode == 1:
             for i in text_rects:
