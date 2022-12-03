@@ -50,7 +50,6 @@ def _rpn_loss_cls(y_true, y_pred):
     cls_true = tf.gather(y_true, cls_keep)
     cls_pred = tf.gather(y_pred[0], cls_keep)
     cls_true = tf.cast(cls_true, 'int64')
-    # loss = K.sparse_categorical_crossentropy(cls_true,cls_pred,from_logits=True)
     loss = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=cls_true, logits=cls_pred)
     return K.switch(tf.size(loss) > 0, K.clip(K.mean(loss), 0, 10), K.constant(0.0))
 
@@ -121,11 +120,10 @@ def post_process(cls_prod, regr, h, w):
 
 class CTPN:
 
-    def __init__(self, lr=0.00001, image_channels=3, vgg_trainable=True, weight_path=None, num_gpu=1):
+    def __init__(self, lr=0.00001, image_channels=3, vgg_trainable=True, weight_path=None):
         self.image_channels = image_channels
         self.image_shape = (None, None, image_channels)
         self.vgg_trainable = vgg_trainable
-        self.num_gpu = num_gpu
         self.lr = lr
         self.train_model, self.predict_model = self.__build_model()
         if weight_path is not None:
@@ -149,7 +147,6 @@ class CTPN:
 
         x1.set_shape((None, None, 512))
 
-        # x2 = Bidirectional(GRU(128, return_sequences=True), name='blstm')(x1)
         x2 = Bidirectional(GRU(128, return_sequences=True, reset_after=False), name='blstm')(x1)
 
         x3 = Lambda(_reshape2, output_shape=(None, None, 256))([x2, x])  # (N, H, W, C)
@@ -213,8 +210,3 @@ class CTPN:
                 cv2.imwrite(output_path, img)
         elif mode == 2:
             return text_rects, img
-
-    @staticmethod
-    def load_config(config_path):
-        with open(config_path, "r") as infile:
-            return dict(json.load(infile))

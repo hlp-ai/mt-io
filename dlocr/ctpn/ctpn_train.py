@@ -4,7 +4,7 @@ from dlocr.ctpn import CTPN
 from dlocr.ctpn import default_ctpn_config_path
 from dlocr.ctpn.data_loader import DataLoader
 from dlocr.custom import SingleModelCK
-
+from dlocr.utils import load_config
 
 if __name__ == '__main__':
     import argparse
@@ -23,7 +23,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    config = CTPN.load_config(args.config_file_path)
+    config = load_config(args.config_file_path)
 
     weights_file_path = args.weights_file_path
     if weights_file_path is not None:
