@@ -26,30 +26,32 @@ def _reshape3(x):
 
 
 def get_model(image_channels=3, vgg_weights_path=None):
-    image_shape = (None, None, image_channels)
+    image_shape = (None, None, image_channels)  # 大小不定
     base_model = VGG16(weights=None, include_top=False, input_shape=image_shape)
-    if vgg_weights_path is not None:
+    if vgg_weights_path is not None:  # 基础模型预训练微调
         base_model.load_weights(vgg_weights_path)
         base_model.trainable = True
     else:
         base_model.trainable = False
 
+    # 基础模型输入和输出
     input = base_model.input
     sub_output = base_model.get_layer('block5_conv3').output
 
-    x = Conv2D(512, (3, 3), strides=(1, 1), padding='same', activation='relu',
-               name='rpn_conv1')(sub_output)
+    x = Conv2D(512, (3, 3), strides=(1, 1), padding='same', activation='relu', name='rpn_conv1')(sub_output)
 
-    x1 = Lambda(_reshape, output_shape=(None, 512))(x)  # output_shape not include batch dim, (N*H, W, C)
+    x1 = Lambda(_reshape, output_shape=(None, 512))(x)  # output_shape not include batch dim, (N*H, W, C), C=512
 
     x1.set_shape((None, None, 512))
 
     x2 = Bidirectional(GRU(128, return_sequences=True, reset_after=False), name='blstm')(x1)
 
-    x3 = Lambda(_reshape2, output_shape=(None, None, 256))([x2, x])  # (N, H, W, C)
+    x3 = Lambda(_reshape2, output_shape=(None, None, 256))([x2, x])  # (N, H, W, C), C=256
     x3 = Conv2D(512, (1, 1), padding='same', activation='relu', name='lstm_fc')(x3)
 
+    # 分类分支
     cls = Conv2D(10 * 2, (1, 1), padding='same', activation='linear', name='rpn_class_origin')(x3)
+    # 高度回归分支
     regr = Conv2D(10 * 2, (1, 1), padding='same', activation='linear', name='rpn_regress_origin')(x3)
 
     cls = Lambda(_reshape3, output_shape=(None, 2), name='rpn_class')(cls)  # (N, H*W*10, 2)
@@ -73,19 +75,22 @@ if __name__ == "__main__":
     data_loader = DataLoader(r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations",
                              r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages")
 
-    s, t = next(data_loader.load_data())
-    print(s.shape, t["rpn_class"].shape, t["rpn_regress"].shape)
+    img, t = next(data_loader.load_data())
+    print(img.shape, t["rpn_class"].shape, t["rpn_regress"].shape)
+
+    img, t = next(data_loader.load_data())
+    print(img.shape, t["rpn_class"].shape, t["rpn_regress"].shape)
 
     print()
 
-    r = m(s)
+    r = m(img)
     print(r)
 
     print()
 
-    r = pm(s)
+    r = pm(img)
     print(r)
 
     pm.load_weights(r"../weights/weights-ctpnlstm-init.hdf5")
-    r = pm(s)
+    r = pm(img)
     print(r)

@@ -1,3 +1,5 @@
+import os
+
 import tensorflow.keras.backend as K
 import tensorflow as tf
 from tensorflow.keras.optimizers import Adam
@@ -53,32 +55,50 @@ optimizer = Adam(1e-05)
 # @tf.function(input_signature=[tf.TensorSpec([1, None, None, 3], tf.float32),
 #                               {"rpn_class": tf.TensorSpec([1, None, None, 2], tf.float32),
 #                                "rpn_regress": tf.TensorSpec([1, None, None, 2], tf.float32)}])
-def train_step(images, gt):
+def train_step(train_model, images, gt):
     with tf.GradientTape() as tape:
-        cls, regr = model(images)
-        cls_loss = _rpn_loss_cls(gt["rpn_class"], cls)
-        regr_loss = _rpn_loss_regr(gt["rpn_regress"], regr)
+        cls, regr = train_model(images)
+        # 计算损失
+        cls_loss = _rpn_loss_cls(gt["rpn_class"], cls)  # 分类损失
+        regr_loss = _rpn_loss_regr(gt["rpn_regress"], regr)  # 位置回归损失
         loss = cls_loss + regr_loss
 
-    gradients = tape.gradient(loss, model.trainable_variables)
-    optimizer.apply_gradients(zip(gradients, model.trainable_variables))
+    gradients = tape.gradient(loss, train_model.trainable_variables)  # 计算梯度
+    optimizer.apply_gradients(zip(gradients, train_model.trainable_variables))  # 更新权重
+
+    # 跟踪训练损失均值
     train_loss(loss)
 
 
 if __name__ == "__main__":
+    save_path = "./ctpn_weights.hdf5"
     model, _ = get_model(vgg_weights_path="../weights/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
+    if os.path.exists(save_path):
+        print("Loading model for training...")
+        model.load_weights(save_path)
 
+    print("Loading training data...")
     data_loader = DataLoader(r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations",
                              r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages")
 
     step = 1
-    steps = 20
-    for s, t in data_loader.load_data():
-        train_step(s, t)
+    steps = 100
+    save_step = 20
+    report_step = 20
 
-        print(step, train_loss.result().numpy())
+    print("Start training...")
+    for img, rpn_gt in data_loader.load_data():
+        train_step(model, img, rpn_gt)
+
+        if step % report_step == 0:
+            print("Step %d, Mean Loss: %f" % (step, train_loss.result().numpy()))
+
+        if step % save_step == 0:
+            print("Saving model...")
+            model.save_weights(save_path)
 
         step += 1
-
         if step > steps:
             break
+
+    print("Finish training.")

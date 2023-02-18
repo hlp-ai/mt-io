@@ -37,13 +37,11 @@ class DataLoader:
         return gtboxes, imgfile, img
 
     def load_data(self):
-
         while True:
-
-            if len(self.__data_queue) == 0:
+            if len(self.__data_queue) == 0:  # reload data from disk files
                 self.__init_queue()
 
-            gtboxes, imgfile, img = self.__data_queue.pop(0)
+            gtboxes, imgfile, img = self.__data_queue.pop(0)  # remove the first example
             h, w, c = img.shape
 
             # 随机水平翻转
@@ -55,7 +53,7 @@ class DataLoader:
                 gtboxes[:, 0] = newx1
                 gtboxes[:, 2] = newx2
 
-            # 每个锚框的类别和垂直高度位置偏差
+            # 每个锚框的类别, 垂直高度位置偏差
             [cls, regr], _ = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtboxes)
 
             # 规范化图像
@@ -66,7 +64,6 @@ class DataLoader:
 
             cls = np.expand_dims(cls, axis=0)
             cls = np.expand_dims(cls, axis=1)
-            # regr = np.expand_dims(regr,axis=1)
             regr = np.expand_dims(regr, axis=0)
 
             yield m_img, {'rpn_class': cls, 'rpn_regress': regr}

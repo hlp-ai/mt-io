@@ -80,8 +80,13 @@ vgg_weights_path = \
 
 
 def post_process(cls_prod, regr, h, w):
+    # 生成基础锚框
     anchor = utils.gen_anchor((int(h / 16), int(w / 16)), 16)
+
+    # 得到预测框
     bbox = utils.bbox_transfor_inv(anchor, regr)
+
+    # 切掉图片范围外的部分
     bbox = utils.clip_box(bbox, [h, w])
 
     # score > 0.7
@@ -93,7 +98,7 @@ def post_process(cls_prod, regr, h, w):
     # filter size
     keep_index = utils.filter_bbox(select_anchor, 16)
 
-    # nsm
+    # nms
     select_anchor = select_anchor[keep_index]
     select_score = select_score[keep_index]
     select_score = np.reshape(select_score, (select_score.shape[0], 1))
