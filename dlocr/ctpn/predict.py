@@ -3,6 +3,7 @@ import time
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.special import softmax
 
 from dlocr.ctpn import default_ctpn_weight_path
 from dlocr.ctpn.core import post_process
@@ -33,7 +34,9 @@ def predict(model, image, output_path=None, mode=1):
     m_img = img - utils.IMAGE_MEAN
     m_img = np.expand_dims(m_img, axis=0)
 
-    cls, regr, cls_prod = model.predict_on_batch(m_img)
+    # cls, regr, cls_prod = model.predict_on_batch(m_img)
+    cls, regr = model.predict_on_batch(m_img)
+    cls_prod = softmax(cls, axis=-1)
 
     # 计算文本框列表
     text_rects = post_process(cls_prod, regr, h, w)
@@ -64,7 +67,7 @@ if __name__ == '__main__':
     weight_path = args.weights_file_path  # 模型权重位置
     output_file_path = args.output_file_path  # 保存标记文件位置
 
-    _, predict_model = get_model()  # 创建模型, 不需加载基础模型权重
+    predict_model = get_model()  # 创建模型, 不需加载基础模型权重
     predict_model.load_weights(r"../weights/weights-ctpnlstm-init.hdf5")  # 加载模型权重
 
     start_time = time.time()

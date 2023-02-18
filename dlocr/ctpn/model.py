@@ -55,19 +55,21 @@ def get_model(image_channels=3, vgg_weights_path=None):
     regr = Conv2D(10 * 2, (1, 1), padding='same', activation='linear', name='rpn_regress_origin')(x3)
 
     cls = Lambda(_reshape3, output_shape=(None, 2), name='rpn_class')(cls)  # (N, H*W*10, 2)
-    cls_prod = Activation('softmax', name='rpn_cls_softmax')(cls)
+    # cls_prod = Activation('softmax', name='rpn_cls_softmax')(cls)
 
     regr = Lambda(_reshape3, output_shape=(None, 2), name='rpn_regress')(regr)  # (N, H*W*10, 2)
 
-    predict_model = Model(input, [cls, regr, cls_prod])
+    # predict_model = Model(input, [cls, regr, cls_prod])
 
     train_model = Model(input, [cls, regr])
 
-    return train_model, predict_model
+    return train_model
+
+    # return train_model, predict_model
 
 
 if __name__ == "__main__":
-    m, pm = get_model()
+    m = get_model()
     m.summary()
     # print(m.output)
     # print(m.get_layer("rpn_regress"))
@@ -88,9 +90,9 @@ if __name__ == "__main__":
 
     print()
 
-    r = pm(img)
+    r = m(img)
     print(r)
 
-    pm.load_weights(r"../weights/weights-ctpnlstm-init.hdf5")
-    r = pm(img)
+    m.load_weights(r"../weights/weights-ctpnlstm-init.hdf5")
+    r = m(img)
     print(r)

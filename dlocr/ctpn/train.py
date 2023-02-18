@@ -83,7 +83,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     save_path = args.weights_file_path
-    model, _ = get_model(vgg_weights_path=args.vgg16_weights_path)
+    model = get_model(vgg_weights_path=args.vgg16_weights_path)
     if os.path.exists(save_path):
         print("Loading model for training...")
         model.load_weights(save_path)
