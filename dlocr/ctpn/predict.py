@@ -6,10 +6,47 @@ import numpy as np
 from scipy.special import softmax
 
 from dlocr.ctpn import default_ctpn_weight_path
-from dlocr.ctpn.core import post_process
 from dlocr.ctpn.lib import utils
+from dlocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
 from dlocr.ctpn.model import get_model
 from dlocr.utils import draw_rect
+
+
+def post_process(cls_prod, regr, h, w):
+    # 生成基础锚框
+    anchor = utils.gen_anchor((int(h / 16), int(w / 16)), 16)
+
+    # 得到预测框
+    bbox = utils.bbox_transfor_inv(anchor, regr)
+
+    # 切掉图片范围外的部分
+    bbox = utils.clip_box(bbox, [h, w])
+
+    # score > 0.7
+    fg = np.where(cls_prod[0, :, 1] > utils.IOU_SELECT)[0]
+    select_anchor = bbox[fg, :]
+    select_score = cls_prod[0, fg, 1]
+    select_anchor = select_anchor.astype('int32')
+
+    # filter size
+    keep_index = utils.filter_bbox(select_anchor, 16)
+
+    # nms
+    select_anchor = select_anchor[keep_index]
+    select_score = select_score[keep_index]
+    select_score = np.reshape(select_score, (select_score.shape[0], 1))
+    nmsbox = np.hstack((select_anchor, select_score))
+    keep = utils.nms(nmsbox, 1 - utils.IOU_SELECT)
+    select_anchor = select_anchor[keep]
+    select_score = select_score[keep]
+
+    # text line
+    textConn = TextProposalConnectorOriented()
+    text_rects = textConn.get_text_lines(select_anchor, select_score, [h, w])
+
+    text_rects = text_rects.astype('int32')
+
+    return text_rects
 
 
 def predict(model, image, output_path=None, mode=1):

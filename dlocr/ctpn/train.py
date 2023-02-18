@@ -2,6 +2,7 @@ import os
 
 import tensorflow.keras.backend as K
 import tensorflow as tf
+from keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 
 from dlocr.ctpn.data_loader import DataLoader
@@ -48,28 +49,6 @@ def _rpn_loss_cls(y_true, y_pred):
     return K.switch(tf.size(loss) > 0, K.clip(K.mean(loss), 0, 10), K.constant(0.0))
 
 
-train_loss = tf.keras.metrics.Mean(name='train_loss')
-optimizer = Adam(1e-05)
-
-
-# @tf.function(input_signature=[tf.TensorSpec([1, None, None, 3], tf.float32),
-#                               {"rpn_class": tf.TensorSpec([1, None, None, 2], tf.float32),
-#                                "rpn_regress": tf.TensorSpec([1, None, None, 2], tf.float32)}])
-def train_step(train_model, images, gt):
-    with tf.GradientTape() as tape:
-        cls, regr = train_model(images)
-        # 计算损失
-        cls_loss = _rpn_loss_cls(gt["rpn_class"], cls)  # 分类损失
-        regr_loss = _rpn_loss_regr(gt["rpn_regress"], regr)  # 位置回归损失
-        loss = cls_loss + regr_loss
-
-    gradients = tape.gradient(loss, train_model.trainable_variables)  # 计算梯度
-    optimizer.apply_gradients(zip(gradients, train_model.trainable_variables))  # 更新权重
-
-    # 跟踪训练损失均值
-    train_loss(loss)
-
-
 if __name__ == "__main__":
     import argparse
 
@@ -92,24 +71,13 @@ if __name__ == "__main__":
     data_path = args.data_path
     data_loader = DataLoader(os.path.join(data_path, "Annotations"), os.path.join(data_path, "JPEGImages"))
 
-    step = 1
-    steps = 100
-    save_step = 20
-    report_step = 5
+    model.compile(optimizer=Adam(1e-05),
+                        loss={'rpn_regress': _rpn_loss_regr, 'rpn_class': _rpn_loss_cls},
+                        loss_weights={'rpn_regress': 1.0, 'rpn_class': 1.0})
 
-    print("Start training...")
-    for img, rpn_gt in data_loader.load_data():
-        train_step(model, img, rpn_gt)
+    checkpoint = ModelCheckpoint(save_path, model=model, save_weights_only=True, monitor='loss',
+                                 save_freq=100, save_best_only=True)
+    earlystop = EarlyStopping(patience=2, monitor='loss')
 
-        if step % report_step == 0:
-            print("Step %d, Mean Loss: %f" % (step, train_loss.result().numpy()))
-
-        if step % save_step == 0:
-            model.save_weights(save_path)
-            print("Saved model into", save_path)
-
-        step += 1
-        if step > steps:
-            break
-
-    print("Finish training.")
+    model.fit(data_loader.load_data(), epochs=1, steps_per_epoch=data_loader.steps_per_epoch,
+              callbacks=[checkpoint, earlystop])
