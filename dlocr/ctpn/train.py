@@ -71,20 +71,31 @@ def train_step(train_model, images, gt):
 
 
 if __name__ == "__main__":
-    save_path = "./ctpn_weights.hdf5"
-    model, _ = get_model(vgg_weights_path="../weights/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5")
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--data_path", default="D:/dataset/ocr/VOCdevkit/VOC2007", help="训练数据位置")
+    parser.add_argument("--weights_file_path", default="./ctpn_weights.hdf5", help="模型权重文件位置")
+    parser.add_argument("--vgg16_weights_path",
+                        default="../weights/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5",
+                        help="VGG16权重文件路径")
+
+    args = parser.parse_args()
+
+    save_path = args.weights_file_path
+    model, _ = get_model(vgg_weights_path=args.vgg16_weights_path)
     if os.path.exists(save_path):
         print("Loading model for training...")
         model.load_weights(save_path)
 
     print("Loading training data...")
-    data_loader = DataLoader(r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations",
-                             r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages")
+    data_path = args.data_path
+    data_loader = DataLoader(os.path.join(data_path, "Annotations"), os.path.join(data_path, "JPEGImages"))
 
     step = 1
     steps = 100
     save_step = 20
-    report_step = 20
+    report_step = 5
 
     print("Start training...")
     for img, rpn_gt in data_loader.load_data():
@@ -94,8 +105,8 @@ if __name__ == "__main__":
             print("Step %d, Mean Loss: %f" % (step, train_loss.result().numpy()))
 
         if step % save_step == 0:
-            print("Saving model...")
             model.save_weights(save_path)
+            print("Saved model into", save_path)
 
         step += 1
         if step > steps:
