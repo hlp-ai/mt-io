@@ -30,28 +30,27 @@ if __name__ == "__main__":
     json_file = args.label_file
     out_file = args.output_file
 
-    f2label = get_img2label(syn_img_dir, json_file)
+    f2label = get_img2label(syn_img_dir, json_file)  # (文本图像文件,文本)元组列表
 
-    meta_file_label = io.open(out_file, "w", encoding="utf-8")
-
-    max_width = 280
-    min_width = 200
+    max_width = 280  # 文本图像最大宽度
+    min_width = 200  # 文本图像最小宽度
     filtered = 0
     count = 0
-    for e in f2label:
-        count += 1
-        if count % 1000 == 0:
-            print("{}/{}".format(filtered, count))
-        img = Image.open(e[0])
-        width = img.size[0]
-        label = e[1]
-        if label[0] == " " or label[-1] == " ":  # filter image with text that begins or ends with space
-            filtered += 1
-            continue
+    with io.open(out_file, "w", encoding="utf-8") as meta_file_label:
+        for e in f2label:
+            count += 1
+            if count % 1000 == 0:
+                print("{}/{}".format(filtered, count))
+            img = Image.open(e[0])
+            width = img.size[0]
+            label = e[1]
+            if label[0] == " " or label[-1] == " ":  # filter image with text that begins or ends with space
+                filtered += 1
+                continue
 
-        if min_width <= width <= max_width:  # filter image, the width of which is in the specified range
-            meta_file_label.write(e[0] + "\t" + e[1] + "\n")
-        else:
-            filtered += 1
+            if min_width <= width <= max_width:  # filter image, the width of which is in the specified range
+                meta_file_label.write(e[0] + "\t" + e[1] + "\n")
+            else:
+                filtered += 1
 
     print("{}/{}".format(filtered, count))
