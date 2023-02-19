@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     syn_img_dir = args.images_dir
     json_file = args.label_file
-    out_file = args.output_file
+    out_file = args.output_file  # 输出标注文件，每行一样本
 
     f2label = get_img2label(syn_img_dir, json_file)  # (文本图像文件,文本)元组列表
 

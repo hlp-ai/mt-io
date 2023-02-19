@@ -55,10 +55,11 @@ def process_imgs(imgs):
 
 
 def load_dict_sp(dict_file_path, encoding="utf-8", blank_first=True):
+    """加载带空格的字典，由ID到字符映射"""
     with open(dict_file_path, encoding=encoding, mode='r') as f:
         chars = list(map(lambda char: char.strip('\r\n'), f.readlines()))
 
-    chars[-1] = " "
+    chars[-1] = " "  # 最后一个为空格字符
 
     if blank_first:
         chars = chars[1:] + ['blank']  # 'blank' is a meta label used for the boundary of characters and used by ctc model
@@ -71,6 +72,13 @@ def load_dict_sp(dict_file_path, encoding="utf-8", blank_first=True):
 class OCRDataset(object):
 
     def __init__(self, dict_file, record_file, max_label_len=32):
+        """
+
+        Args:
+            dict_file: 词典文件
+            record_file: TFRecord文件
+            max_label_len: 文本最大长度
+        """
         self.id2char = load_dict_sp(dict_file)
         self.char2id = {c: i for i, c in self.id2char.items()}
 

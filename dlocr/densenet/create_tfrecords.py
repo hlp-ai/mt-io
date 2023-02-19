@@ -50,14 +50,14 @@ if __name__ == "__main__":
     arg_parser.add_argument("num_examples", type=int)
     args = arg_parser.parse_args()
 
-    meta_file = args.meta_file
+    meta_file = args.meta_file  # 标注文件
     max_chars = 32
-    num_examples = args.num_examples
+    num_examples = args.num_examples  # 最多转换多少样本
 
     lines = io.open(meta_file, encoding="utf-8").readlines()
     lines = [line.strip() for line in lines]
 
-    max_label_len = max([len(line.split("\t")[1]) for line in lines])
+    max_label_len = max([len(line.split("\t")[1]) for line in lines])  # 样本中文本最大长度
     print("Max len of label:", max_label_len)
 
     # filter by length of label
@@ -74,20 +74,18 @@ if __name__ == "__main__":
 
     def split(line):
         pair = tf.strings.split(line, "\t", maxsplit=1)
-        return pair[0], pair[1]
+        return pair[0], pair[1]  # 图像文件, 文本
 
 
     # make dataset
-    ds = tf.data.Dataset.from_tensor_slices(lines)
-    ds = ds.map(split)
+    ds = tf.data.Dataset.from_tensor_slices(lines)  # 行数据集
+    ds = ds.map(split)  # (图像文件, 文本)元组数据集
 
     # to tf.Example
     serialized_ds = ds.map(tf_serialize_example, num_parallel_calls=8)
 
     # write into TFRecords file
     filename = args.tfrecord_file
-    # writer = tf.data.experimental.TFRecordWriter(filename)
-    # writer.write(serialized_ds)
     writer = tf.io.TFRecordWriter(filename)
     count = 0
     for e in serialized_ds:
