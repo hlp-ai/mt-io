@@ -1,3 +1,4 @@
+import sys
 from concurrent.futures.thread import ThreadPoolExecutor
 from io import BytesIO
 
@@ -133,19 +134,8 @@ class OCRDataset(object):
 
 
 if __name__ == "__main__":
-    # filenames = ["dev.tfrecord"]
-    # raw_dataset = tf.data.TFRecordDataset(filenames)
-    # parsed_dataset = raw_dataset.map(_parse_function)
-    #
-    # for e in parsed_dataset.take(2):
-    #     print(e)
-    #     from PIL import Image
-    #     from io import BytesIO
-    #
-    #     img = Image.open(BytesIO(e["img"].numpy()))
-    #     img.show()
-
-    ocr_data = OCRDataset("../dictionary/char_std_5991.txt", "1m-sp-dev.tfrecord")
+    tfr_fn = sys.argv[1]
+    ocr_data = OCRDataset("../dictionary/char_std_5991.txt", tfr_fn)
     ds = ocr_data.get_ds(prefetch_size=4)
     print(ds.element_spec)
     for e in ds.take(1):
