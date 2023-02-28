@@ -6,15 +6,12 @@ import os
 from PIL import Image
 
 
-def get_img2label(syn_img_dir, json_file):
-    json_f = io.open(json_file, encoding="utf-8")
-
-    meta = json.load(json_f)
-    print(meta["num-samples"])
-
-    f2label = meta["labels"]
-
-    f2label = [(os.path.join(syn_img_dir, k + ".jpg"), v) for k, v in f2label.items()]
+def get_img2label(syn_img_dir, label_file):
+    f2label = []
+    with open(label_file, encoding="utf-8") as f:
+        for line in f:
+            parts = line.strip().split(maxsplit=1)
+            f2label.append((os.path.join(syn_img_dir, parts[0] + ".jpg"), parts[1]))
 
     return f2label
 
@@ -27,10 +24,10 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
 
     syn_img_dir = args.images_dir
-    json_file = args.label_file
+    label_file = args.label_file
     out_file = args.output_file  # 输出标注文件，每行一样本
 
-    f2label = get_img2label(syn_img_dir, json_file)  # (文本图像文件,文本)元组列表
+    f2label = get_img2label(syn_img_dir, label_file)  # (文本图像文件,文本)元组列表
 
     max_width = 280  # 文本图像最大宽度
     min_width = 200  # 文本图像最小宽度
