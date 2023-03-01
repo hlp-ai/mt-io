@@ -13,7 +13,6 @@ if __name__ == '__main__':
     import argparse
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-ie", "--initial_epoch", help="初始迭代数", default=0, type=int)
     parser.add_argument("-bs", "--batch_size", help="小批量处理大小", default=64, type=int)
     parser.add_argument("--epochs", help="the number of epochs", default=60, type=int)
     parser.add_argument("--dict_file_path", help="字典文件位置",
@@ -33,7 +32,6 @@ if __name__ == '__main__':
 
     batch_size = args.batch_size
     epochs = args.epochs
-    initial_epoch = args.initial_epoch
 
     config = load_config(args.config_file_path)
     weights_file_path = args.weights_file_path
