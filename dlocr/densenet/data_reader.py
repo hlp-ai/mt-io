@@ -91,7 +91,7 @@ class OCRDataset(object):
         image_label = label.numpy().decode()
         label_len = np.array([len(image_label)])
 
-        label = np.ones([self.max_label_len], dtype=np.int) * 9999  # 9999 is an id that not exists in dictionary
+        label = np.ones([self.max_label_len], dtype=np.int) * 999999  # 999999 is an id that not exists in dictionary
         label[0: len(image_label)] = [self.char2id[c] for c in image_label]
 
         img = Image.open(BytesIO(img_bytes.numpy()))
