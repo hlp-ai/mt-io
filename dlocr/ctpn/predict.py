@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.special import softmax
 
-from dlocr.ctpn import default_ctpn_weight_path
 from dlocr.ctpn.lib import utils
 from dlocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
 from dlocr.ctpn.model import get_model
@@ -95,7 +94,7 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument("--image_path", required=True, help="图像位置")
-    parser.add_argument("--weights_file_path", help="模型权重文件位置", default=default_ctpn_weight_path)
+    parser.add_argument("--weights_file_path", help="模型权重文件位置", default=r"../weights/weights-ctpnlstm-init.hdf5")
     parser.add_argument("--output_file_path", help="标记文件保存位置", default=None)
 
     args = parser.parse_args()
@@ -105,7 +104,7 @@ if __name__ == '__main__':
     output_file_path = args.output_file_path  # 保存标记文件位置
 
     predict_model = get_model()  # 创建模型, 不需加载基础模型权重
-    predict_model.load_weights(r"../weights/weights-ctpnlstm-init.hdf5")  # 加载模型权重
+    predict_model.load_weights(weight_path)  # 加载模型权重
 
     start_time = time.time()
     predict(predict_model, image_path, output_path=output_file_path)
