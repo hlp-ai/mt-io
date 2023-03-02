@@ -13,29 +13,6 @@
 1. 文本检测：CTPN
 2. 文本识别：Densenet + ctc
 
-## 安装
-
-### 运行环境
-
-OS: win10
-Python: 3.6
-
-### 安装步骤
-
-1. 安装tensorflow 1.9.0，若电脑配置了gpu环境，请选择gpu版，否则选择cpu版
-
-  ```sh
-  pip install tensorflow==1.9.0 # 1. for cpu
-  pip install tensorflow-gpu==1.9.0 # 2.  for gpu
-  ```
-
-2. 安装该包
-
-  ```python
-  python setup.py sdist
-  cd dist/
-  pip install dlocr-0.1.tar.gz
-  ```
   
 ## 执行速度
 
@@ -43,187 +20,6 @@ Python: 3.6
 | -------- | --------- | ---------- | ----- |
 | 500kb    | 1070ti    | 20         | 420ms |
 | 500kb    | Tesla k80 | 20         | 1s    |
-
-## 使用
-
-### OCR
-
-用于识别一张图片中的文字
-
-- 编程方式
-
-  ```python
-  import time
-  import dlocr
-
-  if __name__ == '__main__':
-      ocr = dlocr.get_or_create()
-      start = time.time()
-
-      bboxes, texts = ocr.detect("../asset/demo_ctpn.png")
-      print('\n'.join(texts))
-      print(f"cost: {(time.time() - start) * 1000}ms")
-  ```
-
-  `get_or_create()` 支持以下参数用于使用自己训练的模型：
-
-  - ctpn_weight_path
-  - ctpn_config_path
-  - densenet_weight_path
-  - densenet_config_path
-  - dict_path
-
-   参数说明：见以下命令行方式中的参数说明。
-
-- 命令行方式
-
-  ```sh
-  > python -m dlocr -h
-
-  usage: text_detection_app.py [-h] [--image_path IMAGE_PATH]
-                              [--dict_file_path DICT_FILE_PATH]
-                              [--densenet_config_path DENSENET_CONFIG_PATH]
-                              [--ctpn_config_path CTPN_CONFIG_PATH]
-                              [--ctpn_weight_path CTPN_WEIGHT_PATH]
-                              [--densenet_weight_path DENSENET_WEIGHT_PATH]
-                              [--adjust ADJUST]
-
-  optional arguments:
-    -h, --help            show this help message and exit
-    --image_path IMAGE_PATH
-                          图像位置
-    --dict_file_path DICT_FILE_PATH
-                          字典文件位置
-    --densenet_config_path DENSENET_CONFIG_PATH
-                          densenet模型配置文件位置
-    --ctpn_config_path CTPN_CONFIG_PATH
-                          ctpn模型配置文件位置
-    --ctpn_weight_path CTPN_WEIGHT_PATH
-                          ctpn模型权重文件位置
-    --densenet_weight_path DENSENET_WEIGHT_PATH
-                          densenet模型权重文件位置
-    --adjust ADJUST       是否对倾斜的文本进行旋转
-
-  ```
-
-1. ctpn模型权重文件位置不指定默认使用`weights/weights-ctpnlstm-init.hdf5`
-2. ctpn模型配置文件位置不指定默认使用`config/ctpn-default.json`
-3. densenet模型权重文件位置不指定默认使用`weights/weights-densent-init.hdf5`
-4. densenet模型配置文件位置不指定默认使用`config/densent-default.json`
-5. 字典文件位置不指定默认使用`dictionary/char_std_5990.txt`
-
-示例：
-
-```sh
-python -m dlocr  --image_path asset/demo_ctpn.png
-```
-<div>
-    <img src="asset/demo_ctpn.png" width="45%">
-    <img src="asset/text_detect_recognited.png" width="45%">
-</div>
-
-### CTPN
-
-用于定于图像中文字的位置
-
-- 编程方式
-
-  ```python
-  from dlocr import ctpn
-
-  if __name__ == '__main__':
-      ctpn = ctpn.get_or_create()
-      ctpn.predict("asset/demo_ctpn.png", "asset/demo_ctpn_labeled.jpg")
-  ```
-
-- 命令行方式
-
-  ```sh
-  > python dlocr.ctpn_predict.py -h
-
-  usage: ctpn_predict.py [-h] [--image_path IMAGE_PATH]
-                        [--config_file_path CONFIG_FILE_PATH]
-                        [--weights_file_path WEIGHTS_FILE_PATH]
-                        [--output_file_path OUTPUT_FILE_PATH]
-
-  optional arguments:
-    -h, --help            show this help message and exit
-    --image_path IMAGE_PATH
-                          图像位置
-    --config_file_path CONFIG_FILE_PATH
-                          模型配置文件位置
-    --weights_file_path WEIGHTS_FILE_PATH
-                          模型权重文件位置
-    --output_file_path OUTPUT_FILE_PATH
-                          标记文件保存位置
-  ```
-
-  1. 权重文件位置不指定默认使用`weights/weights-ctpnlstm-init.hdf5`
-  2. 配置文件位置不指定默认使用`config/ctpn-default.json`
-
-  示例：
-
-  ```sh
-  python ctpn_predict.py --image_path asset/demo_ctpn.png --output_file_path asset/demo_ctpn_labeled.jpg
-  ```
-
-  <div>
-      <img src="asset/demo_ctpn.png" width="45%">
-      <img src="asset/demo_ctpn_labeled.jpg" width="45%">
-  </div>
-
-### Densenet
-
-用于识别固定图像高度中的文字，默认图像高度为32
-
-- 编程方式
-
-  ```python
-  from dlocr.densenet import load_dict, default_dict_path
-  from dlocr import densenet
-
-  if __name__ == '__main__':
-      densenet = densenet.get_or_create()
-      text, img = densenet.predict("asset/demo_densenet.jpg", load_dict(default_dict_path))
-      print(text)
-  ```
-
-- 命令行方式
-
-  ```sh
-  > python dlocr.densenet_predict.py -h
-
-  usage: densenetocr_predict.py [-h] [--image_path IMAGE_PATH]
-                                [--dict_file_path DICT_FILE_PATH]
-                                [--config_file_path CONFIG_FILE_PATH]
-                                [--weights_file_path WEIGHTS_FILE_PATH]
-
-  optional arguments:
-    -h, --help            show this help message and exit
-    --image_path IMAGE_PATH
-                          图像位置
-    --dict_file_path DICT_FILE_PATH
-                          字典文件位置
-    --config_file_path CONFIG_FILE_PATH
-                          模型配置文件位置
-    --weights_file_path WEIGHTS_FILE_PATH
-                          模型权重文件位置
-  ```
-
-1. 权重文件位置不指定默认使用`weights/weights-densent-init.hdf5`
-2. 配置文件位置不指定默认使用`config/densent-default.json`
-3. 字典文件位置不指定默认使用`dictionary/char_std_5990.txt`
-
-示例：
-
-```sh
-python densenetocr_predict.py --image_path asset/demo_densenet.jpg
-```
-
-<div>
-    <img src="asset/demo_densenet.jpg" width="45%">
-    <img src="asset/demo_densenet_recognited.png" >
-</div>
 
 
 ## 训练
@@ -254,32 +50,6 @@ python densenetocr_predict.py --image_path asset/demo_densenet.jpg
 关于创建自己的文本识别数据集，可参考：[https://github.com/Sanster/text_renderer](https://github.com/Sanster/text_renderer)。
 
 ### CTPN 训练
-
-```sh
-> python -m dlocr.ctpn_train -h
-
-usage: ctpn_train.py [-h] [-ie INITIAL_EPOCH] [--epochs EPOCHS] [--gpus GPUS]
-                     [--images_dir IMAGES_DIR] [--anno_dir ANNO_DIR]
-                     [--config_file_path CONFIG_FILE_PATH]
-                     [--weights_file_path WEIGHTS_FILE_PATH]
-                     [--save_weights_file_path SAVE_WEIGHTS_FILE_PATH]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -ie INITIAL_EPOCH, --initial_epoch INITIAL_EPOCH
-                        初始迭代数
-  --epochs EPOCHS       迭代数
-  --gpus GPUS           gpu的数量
-  --images_dir IMAGES_DIR
-                        图像位置
-  --anno_dir ANNO_DIR   标注文件位置
-  --config_file_path CONFIG_FILE_PATH
-                        模型配置文件位置
-  --weights_file_path WEIGHTS_FILE_PATH
-                        模型初始权重文件位置
-  --save_weights_file_path SAVE_WEIGHTS_FILE_PATH
-                        保存模型训练权重文件位置
-```
 
 ctpn 的训练需要传入2个必要参数：
 
@@ -315,42 +85,6 @@ Epoch 20/20
 ```
 
 ### Densenet 训练
-
-```sh
-> python -m dlocr.densenet_train -h
-usage: densenet_train.py [-h] [-ie INITIAL_EPOCH] [-bs BATCH_SIZE]
-                         [--epochs EPOCHS] [--gpus GPUS]
-                         [--images_dir IMAGES_DIR]
-                         [--dict_file_path DICT_FILE_PATH]
-                         [--train_file_path TRAIN_FILE_PATH]
-                         [--test_file_path TEST_FILE_PATH]
-                         [--config_file_path CONFIG_FILE_PATH]
-                         [--weights_file_path WEIGHTS_FILE_PATH]
-                         [--save_weights_file_path SAVE_WEIGHTS_FILE_PATH]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  -ie INITIAL_EPOCH, --initial_epoch INITIAL_EPOCH
-                        初始迭代数
-  -bs BATCH_SIZE, --batch_size BATCH_SIZE
-                        小批量处理大小
-  --epochs EPOCHS       迭代数
-  --gpus GPUS           gpu的数量
-  --images_dir IMAGES_DIR
-                        图像位置
-  --dict_file_path DICT_FILE_PATH
-                        字典文件位置
-  --train_file_path TRAIN_FILE_PATH
-                        训练文件位置
-  --test_file_path TEST_FILE_PATH
-                        测试文件位置
-  --config_file_path CONFIG_FILE_PATH
-                        模型配置文件位置
-  --weights_file_path WEIGHTS_FILE_PATH
-                        模型初始权重文件位置
-  --save_weights_file_path SAVE_WEIGHTS_FILE_PATH
-                        保存模型训练权重文件位置
-```
 
 Densnet 的训练需要4个必要参数：
 
@@ -393,13 +127,3 @@ Epoch 8/100
 25621/25621 [==============================] - 15560s 607ms/step - loss: 0.0645 - acc: 0.9903 - val_loss: 0.0771 - val_acc: 0.9888
 ```
 
-## 其它
-
-### 训练好的权重文件
-
-链接: https://pan.baidu.com/s/1HaeLO-fV_WCtTZl4DQvrzw 提取码: ihdx
-
-### 参考
-
-1. https://github.com/YCG09/chinese_ocr
-2. https://github.com/xiaomaxiao/keras_ocr
