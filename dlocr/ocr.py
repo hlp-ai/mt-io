@@ -1,18 +1,14 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
 from math import *
-from multiprocessing import Lock
-from dlocr.ctpn import default_ctpn_weight_path, default_ctpn_config_path
-from dlocr.densenet import default_densenet_weight_path, default_densenet_config_path, default_dict_path
+import dlocr.ctpn as ctpn_lib
+import dlocr.densenet as densenet_lib
 
 import cv2
 import numpy as np
 from PIL import Image
 
-from dlocr.ctpn import CTPN
-from dlocr.densenet import DenseNetOCR
 from dlocr.densenet.data_reader import load_dict_sp
-from dlocr.utils import load_config
 
 
 def dumpRotateImage(img, degree, pt1, pt2, pt3, pt4):
@@ -66,7 +62,7 @@ def single_text_detect(rec, ocr, id_to_char, img, adjust):
         return None
 
     image = Image.fromarray(partImg).convert('L')
-    text, _ = ocr.predict(image, id_to_char)
+    text, _ = densenet_lib.predict(ocr, image, id_to_char, num_classes=len(id_to_char))
     return image, text
 
 
@@ -102,56 +98,25 @@ def clip_imgs_with_bboxes(bboxes, img, adjust):
     return imgs
 
 
-class TextDetectionApp:
-    __lock = Lock()
-    __ocr = None
+class OCR:
 
     def __init__(self,
                  ctpn_weight_path,
                  densenet_weight_path,
                  dict_path,
-                 ctpn_config_path=None,
-                 densenet_config_path=None):
-        """
-
-        :param ctpn_weight_path:    CTPN 模型权重文件路径
-        :param densenet_weight_path: Densenet 模型权重文件路径
-        :param dict_path:           字典文件路径
-        :param ctpn_config_path:    CTPN 模型配置文件路径
-        :param densenet_config_path: Densenet 模型配置文件路径
-        """
+                 ):
+        self.ctpn = ctpn_lib.get_model()  # 创建模型, 不需加载基础模型权重
+        self.ctpn.load_weights(ctpn_weight_path)  # 加载模型权重
 
         self.id_to_char = load_dict_sp(dict_path, encoding="utf-8")
-
-        # 初始化CTPN模型
-        if ctpn_config_path is not None:
-            ctpn_config = load_config(ctpn_config_path)
-            ctpn_config["weight_path"] = ctpn_weight_path
-            self.ctpn = CTPN(**ctpn_config)
-        else:
-            self.ctpn = CTPN()
-
-        # 初始化Densenet 模型
-        if densenet_config_path is not None:
-            densenet_config = load_config(densenet_config_path)
-            densenet_config["weight_path"] = densenet_weight_path
-            self.ocr = DenseNetOCR(**densenet_config)
-        else:
-            self.ocr = DenseNetOCR(num_classes=len(self.id_to_char))
+        self.densenet, _ = densenet_lib.get_model(num_classes=len(self.id_to_char))
+        self.densenet.load_weights(densenet_weight_path)
 
     def detect(self, image, adjust=True, parallel=True):
-        """
-
-        :param parallel: 是否并行处理
-        :param image: numpy数组形状为(h, w, c)或图像路径
-        :param adjust: 是否调整检测框
-        :return:
-        """
-
         if type(image) == str:
             if not os.path.exists(image):
                 raise ValueError("The image path: " + image + " not exists!")
-        text_recs, img = self.ctpn.predict(image, mode=2)  # 得到所有的检测框
+        text_recs, img = ctpn_lib.predict(self.ctpn, image, mode=2)
 
         if len(text_recs) == 0:
             return [], []
@@ -161,35 +126,15 @@ class TextDetectionApp:
         if parallel:
             imgs = clip_imgs_with_bboxes(text_recs, img, adjust)
 
-            texts = self.ocr.predict_multi(imgs, id_to_char=self.id_to_char)
+            texts = densenet_lib.predict_multi(self.densenet, imgs,
+                                           id_to_char=self.id_to_char, num_classes=len(self.id_to_char))
         else:
             texts = []
             for index, rec in enumerate(text_recs):
-                image, text = single_text_detect(rec, self.ocr, self.id_to_char, img, adjust)  # 识别文字
+                image, text = single_text_detect(rec, self.densenet, self.id_to_char, img, adjust)  # 识别文字
                 # plt.subplot(len(text_recs), 1, index + 1)
                 # plt.imshow(image)
                 if text is not None and len(text) > 0:
                     texts.append(text)
 
         return text_recs, texts
-
-    @staticmethod
-    def get_or_create(ctpn_weight_path=default_ctpn_weight_path,
-                      ctpn_config_path=default_ctpn_config_path,
-                      densenet_weight_path=default_densenet_weight_path,
-                      densenet_config_path=default_densenet_config_path,
-                      dict_path=default_dict_path):
-
-        TextDetectionApp.__lock.acquire()
-        try:
-            if TextDetectionApp.__ocr is None:
-                TextDetectionApp.__ocr = TextDetectionApp(ctpn_weight_path=ctpn_weight_path,
-                                                          ctpn_config_path=ctpn_config_path,
-                                                          densenet_weight_path=densenet_weight_path,
-                                                          densenet_config_path=densenet_config_path,
-                                                          dict_path=dict_path)
-        except Exception as e:
-            print(e)
-        finally:
-            TextDetectionApp.__lock.release()
-        return TextDetectionApp.__ocr
