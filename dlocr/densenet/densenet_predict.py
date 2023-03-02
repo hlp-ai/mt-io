@@ -69,16 +69,15 @@ if __name__ == '__main__':
     image_path = args.image_path
     dict_file_path = args.dict_file_path
     weight_path = args.weights_file_path
-    config_path = args.config_file_path
 
     id_to_char = load_dict_sp(dict_file_path, "UTF-8")
     print(id_to_char)
 
-    densenet, _ = get_model()
+    densenet, _ = get_model(num_classes=len(id_to_char))
     densenet.load_weights(weight_path)
 
     densenet.summary()
 
     start = time.time()
-    print(predict(densenet, image_path, id_to_char, 5991))
+    print(predict(densenet, image_path, id_to_char, len(id_to_char)))
     print("cost ", (time.time() - start) * 1000, " ms")
