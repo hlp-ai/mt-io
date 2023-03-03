@@ -32,9 +32,6 @@ def dumpRotateImage(img, degree, pt1, pt2, pt3, pt4):
 
 
 def sort_box(box):
-    """
-    对box进行排序
-    """
     box = sorted(box, key=lambda x: sum([x[1], x[3], x[5], x[7]]))
     return box
 
