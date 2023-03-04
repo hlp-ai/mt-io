@@ -8,7 +8,13 @@ from scipy.special import softmax
 from dlocr.ctpn.lib import utils
 from dlocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
 from dlocr.ctpn.model import get_model
-from dlocr.utils import draw_rect
+
+
+def draw_rect(rect, img):
+    cv2.line(img, (rect[0], rect[1]), (rect[2], rect[3]), (255, 0, 0), 2)
+    cv2.line(img, (rect[2], rect[3]), (rect[6], rect[7]), (255, 0, 0), 2)
+    cv2.line(img, (rect[6], rect[7]), (rect[4], rect[5]), (255, 0, 0), 2)
+    cv2.line(img, (rect[4], rect[5]), (rect[0], rect[1]), (255, 0, 0), 2)
 
 
 def post_process(cls_prod, regr, h, w):
