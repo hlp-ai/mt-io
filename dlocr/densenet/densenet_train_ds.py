@@ -3,11 +3,8 @@ import os
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
 from dlocr.custom import LRScheduler, SingleModelCK
-from dlocr.densenet import DenseNetOCR
-
-from dlocr.densenet import default_densenet_config_path
-from dlocr.densenet.data_reader import OCRDataset
-from dlocr.utils import load_config
+from dlocr.densenet import get_model
+from dlocr.densenet.data_reader import OCRDataset, load_dict_sp
 
 if __name__ == '__main__':
     import argparse
@@ -21,8 +18,6 @@ if __name__ == '__main__':
                         default="500k-sp-train.tfrecord")
     parser.add_argument("--test_file_path", help="tfrecord file for dev set",
                         default="500k-sp-dev.tfrecord")
-    parser.add_argument("--config_file_path", help="模型配置文件位置",
-                        default=default_densenet_config_path)
     parser.add_argument("--weights_file_path", help="模型初始权重文件位置",
                         default=r'model/weights-densenet.hdf5')
     parser.add_argument("--save_weights_file_path", help="保存模型训练权重文件位置",
@@ -32,12 +27,7 @@ if __name__ == '__main__':
 
     batch_size = args.batch_size
     epochs = args.epochs
-
-    config = load_config(args.config_file_path)
     weights_file_path = args.weights_file_path
-
-    if os.path.exists(weights_file_path):
-        config["weight_path"] = weights_file_path
 
     dict_file_path = args.dict_file_path
     train_file_path = args.train_file_path
@@ -54,11 +44,14 @@ if __name__ == '__main__':
     dev_data = OCRDataset(dict_file_path, test_file_path, max_label_len=20)
     ds_dev = dev_data.get_ds(batch_size=batch_size, prefetch_size=3200)
 
-    ocr = DenseNetOCR(**config)
-    ocr.parallel_model.summary()
+    id_to_char = load_dict_sp(dict_file_path, "UTF-8")
+    _, train_model = get_model(num_classes=len(id_to_char))
+    train_model.load_weights(weights_file_path)
+
+    train_model.summary()
 
     checkpoint = SingleModelCK(save_weights_file_path,
-                               model=ocr.train_model,
+                               model=train_model,
                                save_weights_only=True,
                                save_best_only=True,
                                verbose=1)
@@ -71,5 +64,5 @@ if __name__ == '__main__':
     # 观测ctc损失的值，一旦损失回升，将学习率缩小一半
     lr_scheduler = LRScheduler(lambda _, lr: lr / 2, watch="loss", watch_his_len=2)
 
-    ocr.parallel_model.fit(ds_train, epochs=epochs, validation_data=ds_dev, callbacks=[checkpoint, earlystop, lr_scheduler])
+    train_model.fit(ds_train, epochs=epochs, validation_data=ds_dev, callbacks=[checkpoint, earlystop, lr_scheduler])
 
