@@ -34,7 +34,6 @@ def parse_and_config():
     """Parse arguments and set configuration parameters."""
     parser = argparse.ArgumentParser(
         description="Preprocess audio and text features "
-        "(See detail in tensorflow_tts/bin/preprocess_dataset.py)."
     )
     parser.add_argument(
         "--rootdir",
@@ -325,9 +324,9 @@ def save_features_to_file(features, subdir, config):
         raise ValueError("'npy' is the only supported format.")
 
 
-def preprocess():
+def preprocess(config):
     """Run preprocessing process and compute statistics for normalizing."""
-    config = parse_and_config()
+    # config = parse_and_config()
 
     dataset_processor = {
         "ljspeech": LJSpeechProcessor,
@@ -487,9 +486,9 @@ def gen_normal_mel(mel_path, scaler, config):
     )
 
 
-def normalize():
+def normalize(config):
     """Normalize mel spectrogram with pre-computed statistics."""
-    config = parse_and_config()
+    # config = parse_and_config()
     if config["format"] == "npy":
         # init scaler with saved values
         scaler = StandardScaler()
@@ -514,42 +513,44 @@ def normalize():
     list(p.map(partial_fn, tqdm(mel_raw_feats, desc="[Normalizing]")))
 
 
-def compute_statistics():
-    """Compute mean / std statistics of some features for later normalization."""
-    config = parse_and_config()
-
-    # find features files for the train split
-    glob_fn = lambda x: glob.glob(os.path.join(config["rootdir"], "train", x, "*.npy"))
-    glob_mel = glob_fn("raw-feats")
-    glob_f0 = glob_fn("raw-f0")
-    glob_energy = glob_fn("raw-energies")
-    assert (
-        len(glob_mel) == len(glob_f0) == len(glob_energy)
-    ), "Features, f0 and energies have different files in training split."
-
-    logging.info(f"Computing statistics for {len(glob_mel)} files.")
-    # init scaler for multiple features
-    scaler_mel = StandardScaler(copy=False)
-    scaler_energy = StandardScaler(copy=False)
-    scaler_f0 = StandardScaler(copy=False)
-
-    for mel, f0, energy in tqdm(
-        zip(glob_mel, glob_f0, glob_energy), total=len(glob_mel)
-    ):
-        # remove outliers
-        energy = np.load(energy)
-        f0 = np.load(f0)
-        # partial fitting of scalers
-        scaler_mel.partial_fit(np.load(mel))
-        scaler_energy.partial_fit(energy[energy != 0].reshape(-1, 1))
-        scaler_f0.partial_fit(f0[f0 != 0].reshape(-1, 1))
-
-    # save statistics to file
-    logging.info("Saving computed statistics.")
-    scaler_list = [(scaler_mel, ""), (scaler_energy, "_energy"), (scaler_f0, "_f0")]
-    save_statistics_to_file(scaler_list, config)
+# def compute_statistics():
+#     """Compute mean / std statistics of some features for later normalization."""
+#     config = parse_and_config()
+#
+#     # find features files for the train split
+#     glob_fn = lambda x: glob.glob(os.path.join(config["rootdir"], "train", x, "*.npy"))
+#     glob_mel = glob_fn("raw-feats")
+#     glob_f0 = glob_fn("raw-f0")
+#     glob_energy = glob_fn("raw-energies")
+#     assert (
+#         len(glob_mel) == len(glob_f0) == len(glob_energy)
+#     ), "Features, f0 and energies have different files in training split."
+#
+#     logging.info(f"Computing statistics for {len(glob_mel)} files.")
+#     # init scaler for multiple features
+#     scaler_mel = StandardScaler(copy=False)
+#     scaler_energy = StandardScaler(copy=False)
+#     scaler_f0 = StandardScaler(copy=False)
+#
+#     for mel, f0, energy in tqdm(
+#         zip(glob_mel, glob_f0, glob_energy), total=len(glob_mel)
+#     ):
+#         # remove outliers
+#         energy = np.load(energy)
+#         f0 = np.load(f0)
+#         # partial fitting of scalers
+#         scaler_mel.partial_fit(np.load(mel))
+#         scaler_energy.partial_fit(energy[energy != 0].reshape(-1, 1))
+#         scaler_f0.partial_fit(f0[f0 != 0].reshape(-1, 1))
+#
+#     # save statistics to file
+#     logging.info("Saving computed statistics.")
+#     scaler_list = [(scaler_mel, ""), (scaler_energy, "_energy"), (scaler_f0, "_f0")]
+#     save_statistics_to_file(scaler_list, config)
 
 
 if __name__ == "__main__":
-    preprocess()
-    normalize()
+    config = parse_and_config()
+
+    preprocess(config)
+    normalize(config)
