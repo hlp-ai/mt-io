@@ -103,14 +103,14 @@ learning_config:
     num_epochs: 50
     checkpoint:
       filepath: D:\dataset\librispeech\run\conformer\checkpoints\{epoch:02d}.h5
-      save_best_only: False
+      save_best_only: True
       save_weights_only: True
-      save_freq: epoch
+      # save_freq: epoch
     states_dir: D:\dataset\librispeech\run\conformer\states
     tensorboard:
       log_dir: D:\dataset\librispeech\run\conformer\tensorboard
       histogram_freq: 1
       write_graph: True
       write_images: True
-      update_freq: epoch
-      profile_batch: 2
+      update_freq: 1000
+      profile_batch: 0

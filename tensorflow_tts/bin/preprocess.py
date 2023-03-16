@@ -19,11 +19,9 @@ from tqdm import tqdm
 from tensorflow_tts.processor import LJSpeechProcessor
 from tensorflow_tts.processor import BakerProcessor
 from tensorflow_tts.processor import LibriTTSProcessor
-from tensorflow_tts.processor import LJSpeechUltimateProcessor
 from tensorflow_tts.processor.ljspeech import LJSPEECH_SYMBOLS
 from tensorflow_tts.processor.baker import BAKER_SYMBOLS
 from tensorflow_tts.processor.libritts import LIBRITTS_SYMBOLS
-from tensorflow_tts.processor.ljspeechu import LJSPEECH_U_SYMBOLS
 
 from tensorflow_tts.utils import remove_outlier
 
@@ -332,21 +330,18 @@ def preprocess(config):
         "ljspeech": LJSpeechProcessor,
         "libritts": LibriTTSProcessor,
         "baker": BakerProcessor,
-        "ljspeechu": LJSpeechUltimateProcessor,
     }
 
     dataset_symbol = {
         "ljspeech": LJSPEECH_SYMBOLS,
         "libritts": LIBRITTS_SYMBOLS,
         "baker": BAKER_SYMBOLS,
-        "ljspeechu": LJSPEECH_U_SYMBOLS,
     }
 
     dataset_cleaner = {
         "ljspeech": "english_cleaners",
         "libritts": None,
         "baker": None,
-        "ljspeechu": "english_cleaners",
     }
 
     logging.info(f"Selected '{config['dataset']}' processor.")

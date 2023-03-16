@@ -89,25 +89,7 @@ class BaseProcessor(abc.ABC):
         self.id_to_symbol = {i: s for i, s in enumerate(self.symbols)}
 
     def create_items(self):
-        """
-        Method used to create items from training file
-        items struct example => text, wav_file_path, speaker_name.
-        Note that the speaker_name should be a last.
-        """
-        with open(
-            os.path.join(self.data_dir, self.train_f_name), mode="r", encoding="utf-8"
-        ) as f:
-            for line in f:
-                parts = line.strip().split(self.delimiter)
-                wav_path = os.path.join(self.data_dir, parts[self.positions["file"]])
-                wav_path = (
-                    wav_path + self.f_extension
-                    if wav_path[-len(self.f_extension) :] != self.f_extension
-                    else wav_path
-                )
-                text = parts[self.positions["text"]]
-                speaker_name = parts[self.positions["speaker_name"]]
-                self.items.append([text, wav_path, speaker_name])
+        raise NotImplementedError()
 
     def add_symbol(self, symbol: Union[str, list]):
         if isinstance(symbol, str):
