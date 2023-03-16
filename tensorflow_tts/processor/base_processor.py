@@ -17,18 +17,14 @@ class BaseProcessor(abc.ABC):
     data_dir: str
     symbols: List[str] = field(default_factory=list)
     speakers_map: Dict[str, int] = field(default_factory=dict)
-    train_f_name: str = "train.txt"
     delimiter: str = "|"
-    positions = {
-        "file": 0,
-        "text": 1,
-        "speaker_name": 2,
-    }  # positions of file,text,speaker_name after split line
     f_extension: str = ".wav"
+
     saved_mapper_path: str = None
     loaded_mapper_path: str = None
-    # extras
+
     items: List[List[str]] = field(default_factory=list)  # text, wav_path, speaker_name
+
     symbol_to_id: Dict[str, int] = field(default_factory=dict)
     id_to_symbol: Dict[int, str] = field(default_factory=dict)
 
