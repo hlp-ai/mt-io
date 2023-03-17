@@ -15,10 +15,9 @@ class DataProcessorError(Exception):
 @dataclass
 class BaseProcessor(abc.ABC):
     data_dir: str
+
     symbols: List[str] = field(default_factory=list)
     speakers_map: Dict[str, int] = field(default_factory=dict)
-    delimiter: str = "|"
-    f_extension: str = ".wav"
 
     saved_mapper_path: str = None
     loaded_mapper_path: str = None

@@ -51,7 +51,7 @@ def parse_and_config():
         "--dataset",
         type=str,
         default="ljspeech",
-        choices=["ljspeech", "libritts", "baker", "ljspeechu"],
+        choices=["ljspeech", "libritts", "baker"],
         help="Dataset to preprocess.",
     )
     parser.add_argument(
@@ -403,7 +403,6 @@ def preprocess(config):
     valid_iterator_data = iterator_data(valid_split)
 
     p = Pool(config["n_cpus"])
-
     # preprocess train files and get statistics for normalizing
     partial_fn = partial(gen_audio_features, config=config)
     train_map = p.imap_unordered(
@@ -411,6 +410,7 @@ def preprocess(config):
         tqdm(train_iterator_data, total=len(train_split), desc="[Preprocessing train]"),
         chunksize=10,
     )
+
     # init scaler for multiple features
     scaler_mel = StandardScaler(copy=False)
     scaler_energy = StandardScaler(copy=False)
@@ -422,14 +422,15 @@ def preprocess(config):
             id_to_remove.append(features["utt_id"])
             continue
         save_features_to_file(features, "train", config)
-        # partial fitting of scalers
+
         if len(energy[energy != 0]) == 0 or len(f0[f0 != 0]) == 0:
             id_to_remove.append(features["utt_id"])
             continue
-        # partial fitting of scalers
+
         if len(energy[energy != 0]) == 0 or len(f0[f0 != 0]) == 0:
             id_to_remove.append(features["utt_id"])
             continue
+
         scaler_mel.partial_fit(mel)
         scaler_energy.partial_fit(energy[energy != 0].reshape(-1, 1))
         scaler_f0.partial_fit(f0[f0 != 0].reshape(-1, 1))
@@ -455,6 +456,7 @@ def preprocess(config):
         tqdm(valid_iterator_data, total=len(valid_split), desc="[Preprocessing valid]"),
         chunksize=10,
     )
+
     for *_, features in valid_map:
         save_features_to_file(features, "valid", config)
 
@@ -483,13 +485,10 @@ def gen_normal_mel(mel_path, scaler, config):
 
 def normalize(config):
     """Normalize mel spectrogram with pre-computed statistics."""
-    # config = parse_and_config()
     if config["format"] == "npy":
         # init scaler with saved values
         scaler = StandardScaler()
-        scaler.mean_, scaler.scale_ = np.load(
-            os.path.join(config["outdir"], "stats.npy")
-        )
+        scaler.mean_, scaler.scale_ = np.load(os.path.join(config["outdir"], "stats.npy"))
         scaler.n_features_in_ = config["num_mels"]
     else:
         raise ValueError("'npy' is the only supported format.")
@@ -506,42 +505,6 @@ def normalize(config):
     p = Pool(config["n_cpus"])
     partial_fn = partial(gen_normal_mel, scaler=scaler, config=config)
     list(p.map(partial_fn, tqdm(mel_raw_feats, desc="[Normalizing]")))
-
-
-# def compute_statistics():
-#     """Compute mean / std statistics of some features for later normalization."""
-#     config = parse_and_config()
-#
-#     # find features files for the train split
-#     glob_fn = lambda x: glob.glob(os.path.join(config["rootdir"], "train", x, "*.npy"))
-#     glob_mel = glob_fn("raw-feats")
-#     glob_f0 = glob_fn("raw-f0")
-#     glob_energy = glob_fn("raw-energies")
-#     assert (
-#         len(glob_mel) == len(glob_f0) == len(glob_energy)
-#     ), "Features, f0 and energies have different files in training split."
-#
-#     logging.info(f"Computing statistics for {len(glob_mel)} files.")
-#     # init scaler for multiple features
-#     scaler_mel = StandardScaler(copy=False)
-#     scaler_energy = StandardScaler(copy=False)
-#     scaler_f0 = StandardScaler(copy=False)
-#
-#     for mel, f0, energy in tqdm(
-#         zip(glob_mel, glob_f0, glob_energy), total=len(glob_mel)
-#     ):
-#         # remove outliers
-#         energy = np.load(energy)
-#         f0 = np.load(f0)
-#         # partial fitting of scalers
-#         scaler_mel.partial_fit(np.load(mel))
-#         scaler_energy.partial_fit(energy[energy != 0].reshape(-1, 1))
-#         scaler_f0.partial_fit(f0[f0 != 0].reshape(-1, 1))
-#
-#     # save statistics to file
-#     logging.info("Saving computed statistics.")
-#     scaler_list = [(scaler_mel, ""), (scaler_energy, "_energy"), (scaler_f0, "_f0")]
-#     save_statistics_to_file(scaler_list, config)
 
 
 if __name__ == "__main__":

@@ -35,6 +35,7 @@ class LibriTTSProcessor(BaseProcessor):
         "speaker_name": 2,
     }  # positions of file,text,speaker_name after split line
     f_extension: str = ".wav"
+    delimiter: str = "|"
     cleaner_names: str = None
 
     def create_items(self):
