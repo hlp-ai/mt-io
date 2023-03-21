@@ -1,11 +1,9 @@
 """Base Model for all model."""
 
 import tensorflow as tf
-import yaml
 import os
-import numpy as np
 
-from tensorflow_tts.utils.utils import MODEL_FILE_NAME, CONFIG_FILE_NAME
+from tensorflow_tts.utils.utils import MODEL_FILE_NAME
 
 
 class BaseModel(tf.keras.Model):
