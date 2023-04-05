@@ -32,9 +32,7 @@ class BaseProcessor(abc.ABC):
         if self.loaded_mapper_path is not None:
             self._load_mapper(loaded_path=self.loaded_mapper_path)
             if self.setup_eos_token():
-                self.add_symbol(
-                    self.setup_eos_token()
-                )  # if this eos token not yet present in symbols list.
+                self.add_symbol(self.setup_eos_token())  # if this eos token not yet present in symbols list.
                 self.eos_id = self.symbol_to_id[self.setup_eos_token()]
             return
 
@@ -52,9 +50,7 @@ class BaseProcessor(abc.ABC):
         self._processor_name = type(self).__name__
 
         if self.setup_eos_token():
-            self.add_symbol(
-                self.setup_eos_token()
-            )  # if this eos token not yet present in symbols list.
+            self.add_symbol(self.setup_eos_token())  # if this eos token not yet present in symbols list.
             self.eos_id = self.symbol_to_id[self.setup_eos_token()]
 
     def __getattr__(self, name: str) -> Union[str, int]:
@@ -63,9 +59,6 @@ class BaseProcessor(abc.ABC):
         return self.symbol_to_id[name]  # map symbol to value
 
     def create_speaker_map(self):
-        """
-        Create speaker map for dataset.
-        """
         sp_id = 0
         for i in self.items:
             speaker_name = i[-1]
@@ -123,9 +116,6 @@ class BaseProcessor(abc.ABC):
         return "eos"
 
     def _load_mapper(self, loaded_path: str = None):
-        """
-        Save all needed mappers to file
-        """
         loaded_path = (
             os.path.join(self.data_dir, "mapper.json")
             if loaded_path is None
