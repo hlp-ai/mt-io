@@ -129,9 +129,7 @@ class LJSpeechProcessor(BaseProcessor):
 
     def create_items(self):
         if self.data_dir:
-            with open(
-                os.path.join(self.data_dir, self.train_f_name), encoding="utf-8"
-            ) as f:
+            with open(os.path.join(self.data_dir, self.train_f_name), encoding="utf-8") as f:
                 self.items = [self.split_line(self.data_dir, line, "|") for line in f]
 
     def split_line(self, data_dir, line, split):
@@ -176,13 +174,9 @@ class LJSpeechProcessor(BaseProcessor):
         while len(text):
             m = _curly_re.match(text)
             if not m:
-                sequence += self._symbols_to_sequence(
-                    self._clean_text(text, [self.cleaner_names])
-                )
+                sequence += self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
                 break
-            sequence += self._symbols_to_sequence(
-                self._clean_text(m.group(1), [self.cleaner_names])
-            )
+            sequence += self._symbols_to_sequence(self._clean_text(m.group(1), [self.cleaner_names]))
             sequence += self._arpabet_to_sequence(m.group(2))
             text = m.group(3)
 
