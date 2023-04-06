@@ -200,3 +200,8 @@ class LJSpeechProcessor(BaseProcessor):
 
     def _should_keep_symbol(self, s):
         return s in self.symbol_to_id and s != "_" and s != "~"
+
+
+if __name__ == "__main__":
+    preprocessor = LJSpeechProcessor(r"D:\dataset\LJSpeech-1.1", symbols=LJSPEECH_SYMBOLS)
+    print(preprocessor.text_to_sequence("This is a book."))

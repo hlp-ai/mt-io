@@ -2,7 +2,7 @@
 
 import os
 import re
-from typing import Dict, List, Union, Tuple, Any
+from typing import Dict, Tuple
 
 import librosa
 import numpy as np
@@ -549,10 +549,7 @@ class BakerProcessor(BaseProcessor):
     def create_items(self):
         items = []
         if self.data_dir:
-            with open(
-                os.path.join(self.data_dir, "ProsodyLabeling/000001-010000.txt"),
-                encoding="utf-8",
-            ) as ttf:
+            with open(os.path.join(self.data_dir, "ProsodyLabeling/000001-010000.txt"), encoding="utf-8") as ttf:
                 lines = ttf.readlines()
                 for idx in range(0, len(lines), 2):
                     utt_id, chn_char = lines[idx].strip().split()
@@ -666,3 +663,7 @@ class BakerProcessor(BaseProcessor):
         # add eos tokens
         sequence += [self.eos_id]
         return sequence
+
+if __name__ == "__main__":
+    preprocessor = BakerProcessor(r"D:\dataset\baker\baker", symbols=BAKER_SYMBOLS)
+    print(preprocessor.text_to_sequence("你好吗？", inference=True))
