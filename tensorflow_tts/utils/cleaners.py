@@ -83,19 +83,3 @@ def english_cleaners(text):
     text = expand_abbreviations(text)
     text = collapse_whitespace(text)
     return text
-
-
-# def korean_cleaners(text):
-#     """Pipeline for Korean text, including number and abbreviation expansion."""
-#     text = ko_tokenize(
-#         text
-#     )  # '존경하는' --> ['ᄌ', 'ᅩ', 'ᆫ', 'ᄀ', 'ᅧ', 'ᆼ', 'ᄒ', 'ᅡ', 'ᄂ', 'ᅳ', 'ᆫ']
-#     return text
-#
-# def german_cleaners(text):
-#     """Pipeline for German text, including number and abbreviation expansion."""
-#     try:
-#         text = GermanTransliterate(replace={';': ',', ':': ' '}, sep_abbreviation=' -- ').transliterate(text)
-#     except NameError:
-#         raise ModuleNotFoundError("Install german_transliterate package to use german_cleaners")
-#     return text
