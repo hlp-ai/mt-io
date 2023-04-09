@@ -274,7 +274,7 @@ class Tacotron2Trainer(Seq2SeqBasedTrainer):
 def main():
     """Run training process."""
     parser = argparse.ArgumentParser(
-        description="Train FastSpeech (See detail in tensorflow_tts/bin/train-fastspeech.py)"
+        description="Train Tacotron2"
     )
     parser.add_argument(
         "--train-dir",
