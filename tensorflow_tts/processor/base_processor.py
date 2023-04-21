@@ -8,10 +8,6 @@ from typing import Dict, List, Union
 from dataclasses import dataclass, field
 
 
-class DataProcessorError(Exception):
-    pass
-
-
 @dataclass
 class BaseProcessor(abc.ABC):
     data_dir: str
@@ -37,7 +33,7 @@ class BaseProcessor(abc.ABC):
             return
 
         if self.symbols.__len__() < 1:
-            raise DataProcessorError("Symbols list is empty but mapper isn't loaded")
+            raise ValueError("Symbols list is empty but mapper isn't loaded")
 
         self.create_items()
         self.create_speaker_map()
