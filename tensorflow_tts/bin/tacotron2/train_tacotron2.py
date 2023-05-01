@@ -473,7 +473,10 @@ def main():
         learning_rate_fn = WarmUp(
             initial_learning_rate=config["optimizer_params"]["initial_learning_rate"],
             decay_schedule_fn=learning_rate_fn,
-            warmup_steps=int(config["optimizer_params"]["warmup_steps"]),
+            warmup_steps=int(
+                config["train_max_steps"]
+                * config["optimizer_params"]["warmup_proportion"]
+            ),
         )
 
         optimizer = AdamWeightDecay(
