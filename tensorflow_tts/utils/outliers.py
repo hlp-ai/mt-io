@@ -22,5 +22,6 @@ def remove_outlier(x, p_bottom: int = 25, p_top: int = 75):
     x[indices_of_outliers] = 0.0
 
     # replace by mean f0.
+    # TODO: wrong comment? max or mean?
     x[indices_of_outliers] = np.max(x)
     return x
