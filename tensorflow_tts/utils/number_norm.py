@@ -1,6 +1,4 @@
 """Number norm module."""
-
-
 import re
 
 import inflect
@@ -72,3 +70,9 @@ def normalize_numbers(text):
     text = re.sub(_ordinal_re, _expand_ordinal, text)
     text = re.sub(_number_re, _expand_number, text)
     return text
+
+
+if __name__ == "__main__":
+    print(normalize_numbers("123"))
+    print(normalize_numbers("2nd"))
+    print(normalize_numbers("$123.4"))
