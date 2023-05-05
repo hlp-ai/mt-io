@@ -83,3 +83,7 @@ def english_cleaners(text):
     text = expand_abbreviations(text)
     text = collapse_whitespace(text)
     return text
+
+
+if __name__ == "__main__":
+    print(english_cleaners("Mr. White has 123   books. 你好"))
