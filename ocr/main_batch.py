@@ -2,7 +2,7 @@
 import argparse
 import time
 
-from dlocr.ocr import OCR
+from ocr.detect import OCR
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

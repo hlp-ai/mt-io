@@ -3,7 +3,7 @@ from tensorflow.keras import Model
 from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.layers import Conv2D, Lambda, Bidirectional, GRU, Activation
 
-from dlocr.ctpn.data_loader import DataLoader
+from ocr.ctpn.data_loader import DataLoader
 
 
 def _reshape(x):

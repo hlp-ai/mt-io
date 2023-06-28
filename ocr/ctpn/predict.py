@@ -5,9 +5,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.special import softmax
 
-from dlocr.ctpn.lib import utils
-from dlocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
-from dlocr.ctpn.model import get_model
+from ocr.ctpn.lib import utils
+from ocr.ctpn.lib.text_proposal_connector_oriented import TextProposalConnectorOriented
+from ocr.ctpn.model import get_model
 
 
 def draw_rect(rect, img):

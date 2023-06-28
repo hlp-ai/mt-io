@@ -5,8 +5,8 @@ from concurrent.futures.thread import ThreadPoolExecutor
 from PIL import Image
 import numpy as np
 
-from dlocr.densenet.data_reader import load_dict_sp, single_img_process, process_imgs
-from dlocr.densenet.model import get_model
+from ocr.densenet.data_reader import load_dict_sp, single_img_process, process_imgs
+from ocr.densenet.model import get_model
 
 
 def decode_single_line(pred_text, nclass, id_to_char):

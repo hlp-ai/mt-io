@@ -5,8 +5,8 @@ import tensorflow as tf
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 
-from dlocr.ctpn.data_loader import DataLoader
-from dlocr.ctpn.model import get_model
+from ocr.ctpn.data_loader import DataLoader
+from ocr.ctpn.model import get_model
 
 
 def _rpn_loss_regr(y_true, y_pred):

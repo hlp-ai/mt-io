@@ -2,9 +2,9 @@ import os
 
 from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
 
-from dlocr.custom import LRScheduler, SingleModelCK
-from dlocr.densenet import get_model
-from dlocr.densenet.data_reader import OCRDataset, load_dict_sp
+from ocr.custom import LRScheduler, SingleModelCK
+from ocr.densenet import get_model
+from ocr.densenet.data_reader import OCRDataset, load_dict_sp
 
 if __name__ == '__main__':
     import argparse

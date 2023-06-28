@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from dlocr.ctpn.model import get_model
+from ocr.ctpn.model import get_model
 
 
 def convert_tflite(prediction_model, quantization):

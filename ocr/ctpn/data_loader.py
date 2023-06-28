@@ -5,7 +5,7 @@ from glob import glob
 import cv2
 import numpy as np
 
-from dlocr.ctpn.lib.utils import random_uniform_num, readxml, cal_rpn, IMAGE_MEAN, bbox_transfor_inv
+from ocr.ctpn.lib.utils import random_uniform_num, readxml, cal_rpn, IMAGE_MEAN, bbox_transfor_inv
 
 
 class DataLoader:
