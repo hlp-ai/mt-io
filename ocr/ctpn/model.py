@@ -80,18 +80,12 @@ if __name__ == "__main__":
     img, t = next(data_loader.load_data())
     print(img.shape, t["rpn_class"].shape, t["rpn_regress"].shape)
 
-    img, t = next(data_loader.load_data())
-    print(img.shape, t["rpn_class"].shape, t["rpn_regress"].shape)
-
     print()
 
     r = m(img)
     print(r)
 
     print()
-
-    r = m(img)
-    print(r)
 
     m.load_weights(r"../weights/weights-ctpnlstm-init.hdf5")
     r = m(img)
