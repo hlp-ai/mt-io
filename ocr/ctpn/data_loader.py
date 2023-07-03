@@ -78,13 +78,15 @@ if __name__ == "__main__":
     gtbox, _ = readxml(xmlpath)
     img = cv2.imread(imgpath)
     h, w, c = img.shape
-    print(h, w)
+    print(h, w, c)
+    print(np.min(img), np.max(img))
 
     [cls, regr], base_anchor = cal_rpn((h, w), (int(h / 16), int(w / 16)), 16, gtbox)
     print(cls.shape)
     print(cls[:10])
     print(regr.shape)
     print(regr[:10])
+    print(base_anchor.shape)
 
     regr = np.expand_dims(regr, axis=0)
     inv_anchor = bbox_transfor_inv(base_anchor, regr)

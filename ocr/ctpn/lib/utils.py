@@ -147,7 +147,7 @@ def bbox_transfor_inv(anchor, regr):
     """
 
     Cya = (anchor[:, 1] + anchor[:, 3]) * 0.5  # 锚框y中心点
-    ha = anchor[:, 3] - anchor[:, 1] + 1
+    ha = anchor[:, 3] - anchor[:, 1] + 1  # 锚框高度
 
     Vcx = regr[..., 0]  # y中心点偏移
     Vhx = regr[..., 1]  # 高度偏移
