@@ -1,7 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import Model
 from tensorflow.keras.applications.vgg16 import VGG16
-from tensorflow.keras.layers import Conv2D, Lambda, Bidirectional, GRU, Activation
+from tensorflow.keras.layers import Conv2D, Lambda, Bidirectional, GRU
 
 from ocr.ctpn.data_loader import DataLoader
 
@@ -82,11 +82,5 @@ if __name__ == "__main__":
 
     print()
 
-    r = m(img)
-    print(r)
-
-    print()
-
-    m.load_weights(r"../weights/weights-ctpnlstm-init.hdf5")
     r = m(img)
     print(r)
