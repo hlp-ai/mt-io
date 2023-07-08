@@ -43,6 +43,30 @@ def tf_serialize_example(img_path, label):
     return tf.reshape(tf_string, ())
 
 
+def create_dataset(lines, filename):
+    def split(line):
+        pair = tf.strings.split(line, "\t", maxsplit=1)
+        return pair[0], pair[1]  # 图像文件, 文本
+
+
+    # make dataset
+    ds = tf.data.Dataset.from_tensor_slices(lines)  # 行数据集
+    ds = ds.map(split)  # (图像文件, 文本)元组数据集
+
+    # to tf.Example
+    serialized_ds = ds.map(tf_serialize_example, num_parallel_calls=8)
+
+    # write into TFRecords file
+    writer = tf.io.TFRecordWriter(filename)
+    count = 0
+    for e in serialized_ds:
+        writer.write(e.numpy())
+        count += 1
+        if count % 100 == 0:
+            print(count)
+    print(count)
+
+
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument("meta_file")
@@ -69,28 +93,16 @@ if __name__ == "__main__":
 
     # subset
     if num_examples is not None:
-        lines = lines[:num_examples]
+        n_train = num_examples
+        n_dev = int(0.1 * num_examples)
+    else:
+        n_train = int(0.9 * len(lines))
+        n_dev = int(0.1 * len(lines))
 
+    train_lines = lines[:n_train]
+    dev_lines = lines[n_train:(n_train+n_dev)]
 
-    def split(line):
-        pair = tf.strings.split(line, "\t", maxsplit=1)
-        return pair[0], pair[1]  # 图像文件, 文本
-
-
-    # make dataset
-    ds = tf.data.Dataset.from_tensor_slices(lines)  # 行数据集
-    ds = ds.map(split)  # (图像文件, 文本)元组数据集
-
-    # to tf.Example
-    serialized_ds = ds.map(tf_serialize_example, num_parallel_calls=8)
-
-    # write into TFRecords file
     filename = args.tfrecord_file
-    writer = tf.io.TFRecordWriter(filename)
-    count = 0
-    for e in serialized_ds:
-        writer.write(e.numpy())
-        count += 1
-        if count % 100 == 0:
-            print(count)
-    print(count)
+    create_dataset(train_lines, filename)
+
+    create_dataset(dev_lines, filename + "-dev")
