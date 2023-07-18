@@ -2,7 +2,7 @@
 import argparse
 import time
 
-from ocr.detect import OCR
+from ocr.detect import OCRImpl
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -15,9 +15,10 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    app = OCR(ctpn_weight_path=args.ctpn_weight_path,
-                           densenet_weight_path=args.densenet_weight_path,
-                           dict_path=args.dict_file_path)
+    app = OCRImpl(ctpn_weight_path=args.ctpn_weight_path,
+                  densenet_weight_path=args.densenet_weight_path,
+                  dict_path=args.dict_file_path,
+                  adjust=args.adjust)
 
     start_no = 16
     end_no = 27
@@ -25,9 +26,9 @@ if __name__ == '__main__':
     for i in range(start_no, end_no):
         img_fn = img_path_pattern.format(i)
         start_time = time.time()
-        _, texts = app.detect(img_fn, args.adjust)
+        texts = app.detect(img_fn)
         print("cost", (time.time() - start_time) * 1000, "ms")
         texts = '\n'.join(texts)
         print(texts)
-        with open(img_fn+".txt", "w", encoding="utf-8") as f:
+        with open(img_fn + ".txt", "w", encoding="utf-8") as f:
             f.write(texts)

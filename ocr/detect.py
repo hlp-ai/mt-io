@@ -9,6 +9,7 @@ import numpy as np
 from PIL import Image
 
 from ocr.densenet.data_reader import load_dict_sp
+from ocr.interface import OCR
 
 
 def dumpRotateImage(img, degree, pt1, pt2, pt3, pt4):
@@ -95,12 +96,13 @@ def clip_imgs_with_bboxes(bboxes, img, adjust):
     return imgs
 
 
-class OCR:
+class OCRImpl(OCR):
 
     def __init__(self,
                  ctpn_weight_path,
                  densenet_weight_path,
                  dict_path,
+                 adjust=True
                  ):
         self.ctpn = ctpn_lib.get_model()  # 创建模型, 不需加载基础模型权重
         self.ctpn.load_weights(ctpn_weight_path)  # 加载模型权重
@@ -109,7 +111,12 @@ class OCR:
         self.densenet, _ = densenet_lib.get_model(num_classes=len(self.id_to_char))
         self.densenet.load_weights(densenet_weight_path)
 
-    def detect(self, image, adjust=True, parallel=True):
+        self.adjust = adjust
+
+    def detect(self, image):
+        return self._detect(image, self.adjust)[1]
+
+    def _detect(self, image, adjust=True, parallel=True):
         if type(image) == str:
             if not os.path.exists(image):
                 raise ValueError("The image path: " + image + " not exists!")

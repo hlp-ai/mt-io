@@ -2,7 +2,7 @@
 import argparse
 import time
 
-from ocr.detect import OCR
+from ocr.detect import OCRImpl
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
@@ -15,10 +15,11 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    app = OCR(ctpn_weight_path=args.ctpn_weight_path,
-                           densenet_weight_path=args.densenet_weight_path,
-                           dict_path=args.dict_file_path)
+    app = OCRImpl(ctpn_weight_path=args.ctpn_weight_path,
+                  densenet_weight_path=args.densenet_weight_path,
+                  dict_path=args.dict_file_path,
+                  adjust=args.adjust)
     start_time = time.time()
-    _, texts = app.detect(args.image_path, args.adjust)
+    texts = app.detect(args.image_path)
     print('\n'.join(texts))
     print("cost", (time.time() - start_time) * 1000, "ms")
