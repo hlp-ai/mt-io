@@ -69,14 +69,14 @@ def create_dataset(lines, filename):
 
 if __name__ == "__main__":
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument("meta_file")
-    arg_parser.add_argument("tfrecord_file")
-    arg_parser.add_argument("num_examples", type=int)
+    arg_parser.add_argument("--meta_file", required=True, help="meta file")
+    arg_parser.add_argument("--tfrecord_file", required=True, help="output tfrecords file")
+    arg_parser.add_argument("--max_imgs", type=int, default=None, help="max number of images")
     args = arg_parser.parse_args()
 
     meta_file = args.meta_file  # 标注文件
     max_chars = 32
-    num_examples = args.num_examples  # 最多转换多少样本
+    num_examples = args.max_imgs  # 最多转换多少样本
 
     lines = io.open(meta_file, encoding="utf-8").readlines()
     lines = [line.strip() for line in lines]
