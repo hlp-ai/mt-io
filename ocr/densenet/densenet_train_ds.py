@@ -12,16 +12,12 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("-bs", "--batch_size", help="小批量处理大小", default=64, type=int)
     parser.add_argument("--epochs", help="the number of epochs", default=60, type=int)
-    parser.add_argument("--dict_file_path", help="字典文件位置",
-                        default="../dictionary/char_std_5991.txt")
-    parser.add_argument("--train_file_path", help="tfrecord file for training set",
-                        default="500k-sp-train.tfrecord")
-    parser.add_argument("--test_file_path", help="tfrecord file for dev set",
-                        default="500k-sp-dev.tfrecord")
-    parser.add_argument("--weights_file_path", help="模型初始权重文件位置",
-                        default=r'model/weights-densenet.hdf5')
+    parser.add_argument("--dict_file_path", help="字典文件位置", required=True)
+    parser.add_argument("--train_file_path", help="tfrecord file for training set", required=True)
+    parser.add_argument("--test_file_path", help="tfrecord file for dev set", required=True)
+    parser.add_argument("--weights_file_path", help="模型初始权重文件位置", default=None)
     parser.add_argument("--save_weights_file_path", help="保存模型训练权重文件位置",
-                        default=r'model/weights-densenet.hdf5')
+                        default=r'./weights-densenet.hdf5')
 
     args = parser.parse_args()
 
@@ -34,10 +30,6 @@ if __name__ == '__main__':
     test_file_path = args.test_file_path
     save_weights_file_path = args.save_weights_file_path
 
-    # TODO: mkdir for save_weight_file_path, not fixed
-    if not os.path.exists("model"):
-        os.makedirs("model")
-
     train_data = OCRDataset(dict_file_path, train_file_path, max_label_len=20)
     ds_train = train_data.get_ds(batch_size=batch_size, prefetch_size=51200)
 
@@ -46,7 +38,8 @@ if __name__ == '__main__':
 
     id_to_char = load_dict_sp(dict_file_path, "UTF-8")
     _, train_model = get_model(num_classes=len(id_to_char))
-    train_model.load_weights(weights_file_path)
+    if weights_file_path is not None:
+        train_model.load_weights(weights_file_path)
 
     train_model.summary()
 
