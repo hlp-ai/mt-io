@@ -92,15 +92,12 @@ if __name__ == "__main__":
     np.random.shuffle(lines)
 
     # subset
-    if num_examples is not None:
-        n_train = num_examples
-        n_dev = int(0.1 * num_examples)
+    n_dev = 1000
+    dev_lines = lines[:n_dev]
+    if args.max_imgs is not None:
+        train_lines = lines[n_dev:(args.max_imgs+n_dev)]
     else:
-        n_train = int(0.9 * len(lines))
-        n_dev = int(0.1 * len(lines))
-
-    train_lines = lines[:n_train]
-    dev_lines = lines[n_train:(n_train+n_dev)]
+        train_lines = lines[n_dev:]
 
     filename = args.tfrecord_file
     create_dataset(train_lines, filename)
