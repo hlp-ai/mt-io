@@ -62,7 +62,7 @@ def create_dataset(lines, filename):
     for e in serialized_ds:
         writer.write(e.numpy())
         count += 1
-        if count % 100 == 0:
+        if count % 500 == 0:
             print(count)
     print(count)
 
