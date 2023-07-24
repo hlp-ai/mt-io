@@ -92,7 +92,7 @@ if __name__ == "__main__":
     np.random.shuffle(lines)
 
     # subset
-    n_dev = 1000
+    n_dev = 2000
     dev_lines = lines[:n_dev]
     if args.max_imgs is not None:
         train_lines = lines[n_dev:(args.max_imgs+n_dev)]
