@@ -72,6 +72,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--meta_file", required=True, help="meta file")
     arg_parser.add_argument("--tfrecord_file", required=True, help="output tfrecords file")
     arg_parser.add_argument("--max_imgs", type=int, default=None, help="max number of images")
+    arg_parser.add_argument("--num_dev", type=int, default=3000, help="number of dev images")
     args = arg_parser.parse_args()
 
     meta_file = args.meta_file  # 标注文件
@@ -92,7 +93,7 @@ if __name__ == "__main__":
     np.random.shuffle(lines)
 
     # subset
-    n_dev = 2000
+    n_dev = args.num_dev
     dev_lines = lines[:n_dev]
     if args.max_imgs is not None:
         train_lines = lines[n_dev:(args.max_imgs+n_dev)]
