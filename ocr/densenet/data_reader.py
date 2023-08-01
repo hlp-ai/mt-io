@@ -96,8 +96,8 @@ class OCRDataset(object):
 
         img = Image.open(BytesIO(img_bytes.numpy()))
 
-        IMAGE_WIDTH = 280  # Fiexed with of image
-        SUBSAMPLE_MULTIPLIER = 8  # Subsampling multiplier of model for CTC input length
+        IMAGE_WIDTH = 280  # Fixed with of image. IMPORTANT: 'img_width' argument for ocr-syn cmd
+        SUBSAMPLE_MULTIPLIER = 8  # Subsampling multiplier of model for CTC input length. IMPORTANT: determined by DenseNet model
         input_len = np.array([IMAGE_WIDTH // SUBSAMPLE_MULTIPLIER])
 
         return single_img_process(img), label, input_len, label_len
