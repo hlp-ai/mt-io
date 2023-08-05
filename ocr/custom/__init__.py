@@ -1,1 +1,1 @@
-from ocr.custom.callbacks import LRScheduler, SingleModelCK
+from ocr.custom.callbacks import LRScheduler

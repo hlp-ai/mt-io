@@ -1,6 +1,6 @@
 import tensorflow.keras.backend as K
 import numpy as np
-from tensorflow.keras.callbacks import Callback, ModelCheckpoint
+from tensorflow.keras.callbacks import Callback
 
 
 class HistoryCache:
@@ -47,21 +47,3 @@ class LRScheduler(Callback):
             lr = self.schedule(epoch, lr)
             print("Update learning rate: ", lr)
             K.set_value(self.model.optimizer.lr, lr)
-
-
-class SingleModelCK(ModelCheckpoint):
-    """
-    用于解决在多gpu下训练保存的权重无法应用于单gpu的情况
-    """
-
-    def __init__(self, filepath, model, monitor='val_loss', verbose=0,
-                 save_best_only=False, save_weights_only=False,
-                 mode='auto', period=1):
-        super().__init__(filepath=filepath, monitor=monitor, verbose=verbose,
-                         save_weights_only=save_weights_only,
-                         save_best_only=save_best_only,
-                         mode=mode, period=period)
-        self.model = model
-
-    def set_model(self, model):
-        pass

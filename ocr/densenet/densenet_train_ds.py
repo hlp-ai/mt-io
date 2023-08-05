@@ -1,8 +1,10 @@
 import os
 
-from tensorflow.keras.callbacks import EarlyStopping, TensorBoard
+import tensorflow as tf
 
-from ocr.custom import LRScheduler, SingleModelCK
+from tensorflow.keras.callbacks import EarlyStopping
+
+from ocr.custom import LRScheduler
 from ocr.densenet import get_model
 from ocr.densenet.data_reader import OCRDataset, load_dict_sp
 
@@ -15,20 +17,16 @@ if __name__ == '__main__':
     parser.add_argument("--dict_file_path", help="字典文件位置", required=True)
     parser.add_argument("--train_file_path", help="tfrecord file for training set", required=True)
     parser.add_argument("--test_file_path", help="tfrecord file for dev set", required=True)
-    parser.add_argument("--weights_file_path", help="模型初始权重文件位置", default=None)
-    parser.add_argument("--save_weights_file_path", help="保存模型训练权重文件位置",
-                        default=r'./weights-densenet.hdf5')
+    parser.add_argument("--weights_file_path", default="./densenet.hdf5")
 
     args = parser.parse_args()
 
     batch_size = args.batch_size
     epochs = args.epochs
-    weights_file_path = args.weights_file_path
 
     dict_file_path = args.dict_file_path
     train_file_path = args.train_file_path
     test_file_path = args.test_file_path
-    save_weights_file_path = args.save_weights_file_path
 
     train_data = OCRDataset(dict_file_path, train_file_path, max_label_len=20)
     ds_train = train_data.get_ds(batch_size=batch_size, prefetch_size=96000)
@@ -38,13 +36,15 @@ if __name__ == '__main__':
 
     id_to_char = load_dict_sp(dict_file_path, "UTF-8")
     _, train_model = get_model(num_classes=len(id_to_char))
-    if weights_file_path is not None:
+
+    weights_file_path = args.weights_file_path
+    if os.path.exists(weights_file_path):
+        print("Loading weight from", weights_file_path)
         train_model.load_weights(weights_file_path)
 
     train_model.summary()
 
-    checkpoint = SingleModelCK(save_weights_file_path,
-                               model=train_model,
+    checkpoint = tf.keras.callbacks.ModelCheckpoint(weights_file_path,
                                save_weights_only=True,
                                save_best_only=True,
                                verbose=1)
