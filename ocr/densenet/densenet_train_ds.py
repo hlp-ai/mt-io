@@ -2,8 +2,6 @@ import os
 
 import tensorflow as tf
 
-from tensorflow.keras.callbacks import EarlyStopping
-
 from ocr.custom import LRScheduler
 from ocr.densenet import get_model
 from ocr.densenet.data_reader import OCRDataset, load_dict_sp
@@ -18,6 +16,7 @@ if __name__ == '__main__':
     parser.add_argument("--train_file_path", help="tfrecord file for training set", required=True)
     parser.add_argument("--test_file_path", help="tfrecord file for dev set", required=True)
     parser.add_argument("--weights_file_path", default="./densenet.hdf5")
+    parser.add_argument("--log_dir", default="./logs")
 
     args = parser.parse_args()
 
@@ -49,13 +48,12 @@ if __name__ == '__main__':
                                save_best_only=True,
                                verbose=1)
 
-    earlystop = EarlyStopping(patience=3, verbose=1)
-    # log = TensorBoard(log_dir='logs', histogram_freq=0, batch_size=train_data_loader.batch_size,
-    #                   write_graph=True,
-    #                   write_grads=False)
+    earlystop = tf.keras.callbacks.EarlyStopping(patience=3, verbose=1)
+
+    tb_callback = tf.keras.callbacks.TensorBoard(log_dir=args.log_dir, update_freq=1000)
     #
     # 观测ctc损失的值，一旦损失回升，将学习率缩小一半
     lr_scheduler = LRScheduler(lambda _, lr: lr / 2, watch="loss", watch_his_len=2)
 
-    train_model.fit(ds_train, epochs=epochs, validation_data=ds_dev, callbacks=[checkpoint, earlystop, lr_scheduler])
+    train_model.fit(ds_train, epochs=epochs, validation_data=ds_dev, callbacks=[checkpoint, earlystop, lr_scheduler, tb_callback])
 
