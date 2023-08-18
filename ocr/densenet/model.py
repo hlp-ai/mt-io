@@ -30,7 +30,7 @@ def _conv_block(input, growth_rate, dropout_rate=None, weight_decay=1e-4):
     return x
 
 
-def _transition_block(input, nb_filter, dropout_rate=None, pooltype=1, weight_decay=1e-4):
+def _transition_block(input, nb_filter, dropout_rate=None, weight_decay=1e-4):
     x = BatchNormalization(epsilon=1.1e-5)(input)
     x = Activation('relu')(x)
     x = Conv2D(nb_filter, (1, 1), kernel_initializer='he_normal', padding='same', use_bias=False,
@@ -39,13 +39,7 @@ def _transition_block(input, nb_filter, dropout_rate=None, pooltype=1, weight_de
     if dropout_rate:
         x = Dropout(dropout_rate)(x)
 
-    if pooltype == 2:
-        x = AveragePooling2D((2, 2), strides=(2, 2))(x)
-    elif pooltype == 1:
-        x = ZeroPadding2D(padding=(0, 1))(x)
-        x = AveragePooling2D((2, 2), strides=(2, 1))(x)
-    elif pooltype == 3:
-        x = AveragePooling2D((2, 2), strides=(2, 1))(x)
+    x = AveragePooling2D((2, 2), strides=(2, 2))(x)
 
     return x, nb_filter
 
@@ -69,12 +63,12 @@ def get_model(num_classes=5991,
     # output channels: 64 +  8 * 8 = 128
     x, nb_filter = _dense_block(x, 8, nb_filter, 8, None, weight_decay)
     # output channels: 128, (h/4, w/4, 128)
-    x, nb_filter = _transition_block(x, 128, dropout_rate, 2, weight_decay)
+    x, nb_filter = _transition_block(x, 128, dropout_rate, weight_decay)
 
     # output channels: 128 + 8 * 8 = 192
     x, nb_filter = _dense_block(x, 8, nb_filter, 8, None, weight_decay)
     # output channels: 192->128, (h/8, w/8, 128)
-    x, nb_filter = _transition_block(x, 128, dropout_rate, 2, weight_decay)
+    x, nb_filter = _transition_block(x, 128, dropout_rate, weight_decay)
 
     # output channels: 128 + 8 * 8 = 192
     x, nb_filter = _dense_block(x, 8, nb_filter, 8, None, weight_decay)
