@@ -5,7 +5,6 @@ import os
 from collections import OrderedDict
 
 from tensorflow_tts.configs import (
-    FastSpeechConfig,
     FastSpeech2Config,
     MelGANGeneratorConfig,
     MultiBandMelGANGeneratorConfig,
@@ -18,7 +17,6 @@ from tensorflow_tts.models import (
 )
 
 from tensorflow_tts.inference.savable_models import (
-    SavableTFFastSpeech,
     SavableTFFastSpeech2,
     SavableTFTacotron2
 )
@@ -30,7 +28,6 @@ from huggingface_hub import hf_hub_url, cached_download
 TF_MODEL_MAPPING = OrderedDict(
     [
         (FastSpeech2Config, SavableTFFastSpeech2),
-        (FastSpeechConfig, SavableTFFastSpeech),
         (MultiBandMelGANGeneratorConfig, TFMBMelGANGenerator),
         (MelGANGeneratorConfig, TFMelGANGenerator),
         (Tacotron2Config, SavableTFTacotron2),
