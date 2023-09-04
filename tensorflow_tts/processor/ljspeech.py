@@ -203,5 +203,18 @@ class LJSpeechProcessor(BaseProcessor):
 
 
 if __name__ == "__main__":
-    preprocessor = LJSpeechProcessor(r"D:\dataset\LJSpeech-1.1", symbols=LJSPEECH_SYMBOLS)
-    print(preprocessor.text_to_sequence("This is a book."))
+    preprocessor = LJSpeechProcessor(data_dir=None, symbols=LJSPEECH_SYMBOLS)
+    txt = "This is a book."
+    ids = preprocessor.text_to_sequence(txt)
+    print(ids)
+    symbols = [preprocessor.id_to_symbol[id] for id in ids]
+    print(symbols)
+
+    from g2p_en import G2p
+    g2p = G2p()
+    pron = g2p(txt)
+    print(pron)
+    ids = preprocessor.text_to_sequence(txt + "{" + " ".join(pron) + "}")
+    print(ids)
+    symbols = [preprocessor.id_to_symbol[id] for id in ids]
+    print(symbols)
