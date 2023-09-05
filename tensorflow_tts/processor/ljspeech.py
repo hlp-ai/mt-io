@@ -156,6 +156,8 @@ class LJSpeechProcessor(BaseProcessor):
     def get_one_sample(self, item):
         text, wav_path, speaker_name = item
 
+        text = self.get_phoneme(text)
+
         # normalize audio signal to be [-1, 1], soundfile already norm.
         audio, rate = sf.read(wav_path)
         audio = audio.astype(np.float32)
