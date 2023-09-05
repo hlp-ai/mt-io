@@ -3,6 +3,8 @@
 import os
 import re
 
+from g2p_en import G2p
+
 import numpy as np
 import soundfile as sf
 from dataclasses import dataclass
@@ -112,7 +114,11 @@ LJSPEECH_SYMBOLS = (
 )
 
 # Regular expression matching text enclosed in curly braces:
-_curly_re = re.compile(r"(.*?)\{(.+?)\}(.*)")
+# _curly_re = re.compile(r"(.*?)\{(.+?)\}(.*)")
+_curly_re = re.compile(r"\{(.+?)\}")
+
+
+g2p = G2p()
 
 
 @dataclass
@@ -171,14 +177,20 @@ class LJSpeechProcessor(BaseProcessor):
     def text_to_sequence(self, text, inference=True):
         sequence = []
         # Check for curly braces and treat their contents as ARPAbet:
-        while len(text):
-            m = _curly_re.match(text)
-            if not m:
-                sequence += self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
-                break
-            sequence += self._symbols_to_sequence(self._clean_text(m.group(1), [self.cleaner_names]))
-            sequence += self._arpabet_to_sequence(m.group(2))
-            text = m.group(3)
+        # while len(text):
+        #     m = _curly_re.match(text)
+        #     if not m:
+        #         sequence += self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
+        #         break
+        #     sequence += self._symbols_to_sequence(self._clean_text(m.group(1), [self.cleaner_names]))
+        #     sequence += self._arpabet_to_sequence(m.group(2))
+        #     text = m.group(3)
+
+        m = _curly_re.match(text)
+        if not m:
+            sequence += self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
+        else:
+            sequence += self._arpabet_to_sequence(m.group(1))
 
         # add eos tokens
         sequence += [self.eos_id]
@@ -201,6 +213,12 @@ class LJSpeechProcessor(BaseProcessor):
     def _should_keep_symbol(self, s):
         return s in self.symbol_to_id and s != "_" and s != "~"
 
+    def txt2phoneme(self, txt):
+        return " ".join(g2p(txt))
+
+    def get_phoneme(self, txt):
+        return "{" + self.txt2phoneme(txt) + "}"
+
 
 if __name__ == "__main__":
     preprocessor = LJSpeechProcessor(data_dir=None, symbols=LJSPEECH_SYMBOLS)
@@ -210,11 +228,9 @@ if __name__ == "__main__":
     symbols = [preprocessor.id_to_symbol[id] for id in ids]
     print(symbols)
 
-    from g2p_en import G2p
-    g2p = G2p()
     pron = g2p(txt)
     print(pron)
-    ids = preprocessor.text_to_sequence(txt + "{" + " ".join(pron) + "}")
+    ids = preprocessor.text_to_sequence(preprocessor.get_phoneme(txt))
     print(ids)
     symbols = [preprocessor.id_to_symbol[id] for id in ids]
     print(symbols)
