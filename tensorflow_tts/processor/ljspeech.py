@@ -192,10 +192,15 @@ class LJSpeechProcessor(BaseProcessor):
         if not m:
             sequence += self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
         else:
-            sequence += self._arpabet_to_sequence(m.group(1))
+            phoneme = m.group(1)
+            sequence += self._arpabet_to_sequence(phoneme)
 
         # add eos tokens
         sequence += [self.eos_id]
+
+        if inference:
+            print(f"phoneme seq: {phoneme}")
+
         return sequence
 
     def _clean_text(self, text, cleaner_names):
