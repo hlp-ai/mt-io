@@ -666,4 +666,4 @@ class BakerProcessor(BaseProcessor):
 
 if __name__ == "__main__":
     preprocessor = BakerProcessor(r"D:\dataset\baker\baker", symbols=BAKER_SYMBOLS)
-    print(preprocessor.text_to_sequence("你好吗？", inference=True))
+    print(preprocessor.text_to_sequence("你好吗，今天天气真好！", inference=True))

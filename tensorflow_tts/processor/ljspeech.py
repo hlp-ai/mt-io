@@ -198,9 +198,6 @@ class LJSpeechProcessor(BaseProcessor):
         # add eos tokens
         sequence += [self.eos_id]
 
-        if inference:
-            print(f"phoneme seq: {phoneme}")
-
         return sequence
 
     def _clean_text(self, text, cleaner_names):
@@ -215,7 +212,7 @@ class LJSpeechProcessor(BaseProcessor):
         return [self.symbol_to_id[s] for s in symbols if self._should_keep_symbol(s)]
 
     def _arpabet_to_sequence(self, text):
-        return self._symbols_to_sequence(["@" + s for s in text.split()])
+        return self._symbols_to_sequence(["@" + s if s not in _punctuation else s for s in text.split()])
 
     def _should_keep_symbol(self, s):
         return s in self.symbol_to_id and s != "_" and s != "~"
@@ -229,15 +226,15 @@ class LJSpeechProcessor(BaseProcessor):
 
 if __name__ == "__main__":
     preprocessor = LJSpeechProcessor(data_dir=None, symbols=LJSPEECH_SYMBOLS)
-    txt = "This is a book."
+    txt = "This is a book, and I like it."
     ids = preprocessor.text_to_sequence(txt)
     print(ids)
     symbols = [preprocessor.id_to_symbol[id] for id in ids]
     print(symbols)
 
-    pron = g2p(txt)
+    pron = preprocessor.get_phoneme(txt)
     print(pron)
-    ids = preprocessor.text_to_sequence(preprocessor.get_phoneme(txt))
+    ids = preprocessor.text_to_sequence(pron)
     print(ids)
     symbols = [preprocessor.id_to_symbol[id] for id in ids]
     print(symbols)
