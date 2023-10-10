@@ -85,8 +85,6 @@ for c, n in char2count.items():
     print(c, hex(ord(c)))
 
 for c, n in char2count.items():
-    if c == " ":
-        continue
     outv.write(c + "\n")
 
 outf.close()
