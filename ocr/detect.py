@@ -136,8 +136,6 @@ class OCRImpl(OCR):
             texts = []
             for index, rec in enumerate(text_recs):
                 image, text = single_text_detect(rec, self.densenet, self.id_to_char, img, adjust)  # 识别文字
-                # plt.subplot(len(text_recs), 1, index + 1)
-                # plt.imshow(image)
                 if text is not None and len(text) > 0:
                     texts.append(text)
 
