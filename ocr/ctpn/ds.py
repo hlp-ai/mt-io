@@ -49,24 +49,23 @@ def get_annotation_data(annotations_dir, images_dir):
     return samples
 
 
-anno_dir = r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations"
-images_dir = r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages"
+if __name__ == "__main__":
+    anno_dir = r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations"
+    images_dir = r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages"
 
-# xml_files = get_annotation_files(r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations")
+    # xml_files = get_annotation_files(r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations")
 
-# print(len(xml_files))
-# print(xml_files)
-#
-# xmlpath = r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations\img_1001.xml"
-#
-# gtboxes, imgfile = readxml(xmlpath, r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages")
-# print(imgfile)
-# print(gtboxes)
+    # print(len(xml_files))
+    # print(xml_files)
+    #
+    # xmlpath = r"D:\dataset\ocr\VOCdevkit\VOC2007\Annotations\img_1001.xml"
+    #
+    # gtboxes, imgfile = readxml(xmlpath, r"D:\dataset\ocr\VOCdevkit\VOC2007\JPEGImages")
+    # print(imgfile)
+    # print(gtboxes)
 
-# for s in gen_annotation_data(anno_dir, images_dir):
-#     print(s)
+    # for s in gen_annotation_data(anno_dir, images_dir):
+    #     print(s)
 
-samples = get_annotation_data(anno_dir, images_dir)
-print(len(samples))
-
-
+    samples = get_annotation_data(anno_dir, images_dir)
+    print(len(samples))
