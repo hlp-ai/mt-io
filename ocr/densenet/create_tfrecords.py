@@ -62,7 +62,7 @@ def create_dataset(lines, filename):
     for e in serialized_ds:
         writer.write(e.numpy())
         count += 1
-        if count % 500 == 0:
+        if count % 1000 == 0:
             print(count)
     print(count)
 
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     arg_parser.add_argument("--meta_file", required=True, help="meta file")
     arg_parser.add_argument("--tfrecord_file", required=True, help="output tfrecords file")
     arg_parser.add_argument("--max_imgs", type=int, default=None, help="max number of images")
-    arg_parser.add_argument("--num_dev", type=int, default=3000, help="number of dev images")
+    arg_parser.add_argument("--num_dev", type=int, default=5000, help="number of dev images")
     args = arg_parser.parse_args()
 
     meta_file = args.meta_file  # 标注文件
