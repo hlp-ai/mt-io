@@ -55,15 +55,12 @@ def process_imgs(imgs):
     return np.array(output)
 
 
-def load_dict_sp(dict_file_path, encoding="utf-8", blank_first=True):
+def load_dict_sp(dict_file_path, encoding="utf-8"):
     """加载带空格的字典，由ID到字符映射"""
     with open(dict_file_path, encoding=encoding, mode='r') as f:
         chars = list(map(lambda char: char.strip('\r\n'), f.readlines()))
 
-    chars[-1] = " "  # 最后一个为空格字符
-
-    if blank_first:
-        chars = chars[1:] + ['blank']  # 'blank' is a meta label used for the boundary of characters and used by ctc model
+    chars = chars + ['blank']  # 'blank' is a meta label used for the boundary of characters, used by ctc model
 
     dic = {i: v for i, v in enumerate(chars)}
 
@@ -96,8 +93,10 @@ class OCRDataset(object):
 
         img = Image.open(BytesIO(img_bytes.numpy()))
 
-        IMAGE_WIDTH = 280  # Fixed with of image. IMPORTANT: 'img_width' argument for ocr-syn cmd
-        SUBSAMPLE_MULTIPLIER = 8  # Subsampling multiplier of model for CTC input length. IMPORTANT: determined by DenseNet model
+        # Fixed with of image. IMPORTANT: 'img_width' argument for ocr-syn cmd
+        IMAGE_WIDTH = 280
+        # Subsampling multiplier of model for CTC input length. IMPORTANT: determined by DenseNet model
+        SUBSAMPLE_MULTIPLIER = 8
         input_len = np.array([IMAGE_WIDTH // SUBSAMPLE_MULTIPLIER])
 
         return single_img_process(img), label, input_len, label_len
@@ -113,7 +112,7 @@ class OCRDataset(object):
                 'input_length': input_len,
                 'label_length': label_len}, {'ctc': 0.0}  # ctc is just a loss placeholder, whose value not matter
 
-    def get_ds(self, batch_size=2, prefetch_size=6400):
+    def get_ds(self, batch_size=32):
         """Get dataset"""
         filenames = [self.record_file]
         raw_dataset = tf.data.TFRecordDataset(filenames)
@@ -126,9 +125,9 @@ class OCRDataset(object):
 
         parsed_dataset = parsed_dataset.map(self.tf_xy)
 
-        parsed_dataset = parsed_dataset.shuffle(buffer_size=prefetch_size).batch(batch_size,
+        parsed_dataset = parsed_dataset.shuffle(buffer_size=2048).batch(batch_size,
                                                                                  drop_remainder=True).prefetch(
-            prefetch_size)
+            tf.data.AUTOTUNE)
 
         return parsed_dataset
 
@@ -136,7 +135,7 @@ class OCRDataset(object):
 if __name__ == "__main__":
     tfr_fn = sys.argv[1]
     ocr_data = OCRDataset("../dictionary/char_std_5991.txt", tfr_fn)
-    ds = ocr_data.get_ds(prefetch_size=4)
+    ds = ocr_data.get_ds()
     print(ds.element_spec)
     for e in ds.take(1):
         print(e[0]["the_input"].numpy().min(), e[0]["the_input"].numpy().max())

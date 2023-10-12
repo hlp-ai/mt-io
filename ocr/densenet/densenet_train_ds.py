@@ -28,10 +28,10 @@ if __name__ == '__main__':
     test_file_path = args.test_file_path
 
     train_data = OCRDataset(dict_file_path, train_file_path, max_label_len=20)
-    ds_train = train_data.get_ds(batch_size=batch_size, prefetch_size=96000)
+    ds_train = train_data.get_ds(batch_size=batch_size)
 
     dev_data = OCRDataset(dict_file_path, test_file_path, max_label_len=20)
-    ds_dev = dev_data.get_ds(batch_size=batch_size, prefetch_size=4800)
+    ds_dev = dev_data.get_ds(batch_size=batch_size)
 
     id_to_char = load_dict_sp(dict_file_path, "UTF-8")
     _, train_model = get_model(num_classes=len(id_to_char))
