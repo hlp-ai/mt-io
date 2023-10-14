@@ -77,7 +77,7 @@ if __name__ == "__main__":
                         loss_weights={'rpn_regress': 1.0, 'rpn_class': 1.0})
 
     checkpoint = ModelCheckpoint(save_path, model=model, save_weights_only=True, monitor='loss',
-                                 save_freq=100, save_best_only=True)
+                                 save_freq=500, save_best_only=True)
     earlystop = EarlyStopping(patience=2, monitor='loss')
 
     model.fit(data_loader.load_data(), epochs=1, steps_per_epoch=data_loader.steps_per_epoch,
