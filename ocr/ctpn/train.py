@@ -87,5 +87,5 @@ if __name__ == "__main__":
     #                              lr_decay=0.5,
     #                              mult_factor=1.2)
 
-    model.fit(data_loader.load_data(), epochs=1, steps_per_epoch=data_loader.steps_per_epoch,
+    model.fit(data_loader.load_data(), epochs=20, steps_per_epoch=data_loader.steps_per_epoch,
               callbacks=[checkpoint, earlystop])
