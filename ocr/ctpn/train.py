@@ -7,6 +7,7 @@ from tensorflow.keras.optimizers import Adam
 
 from ocr.ctpn.data_loader import DataLoader
 from ocr.ctpn.model import get_model
+from ocr.custom.callbacks import SGDRScheduler
 
 
 def _rpn_loss_regr(y_true, y_pred):
@@ -58,6 +59,7 @@ if __name__ == "__main__":
     parser.add_argument("--vgg16_weights_path",
                         default="../weights/vgg16_weights_tf_dim_ordering_tf_kernels_notop.h5",
                         help="VGG16权重文件路径")
+    parser.add_argument("-ie", "--initial_epoch", help="初始迭代数", default=0, type=int)
 
     args = parser.parse_args()
 
@@ -76,9 +78,14 @@ if __name__ == "__main__":
                         loss={'rpn_regress': _rpn_loss_regr, 'rpn_class': _rpn_loss_cls},
                         loss_weights={'rpn_regress': 1.0, 'rpn_class': 1.0})
 
-    checkpoint = ModelCheckpoint(save_path, model=model, save_weights_only=True, monitor='loss',
-                                 save_freq=500, save_best_only=True)
+    checkpoint = ModelCheckpoint(save_path, model=model, save_weights_only=True, monitor='loss', save_best_only=True)
     earlystop = EarlyStopping(patience=2, monitor='loss')
+    # lr_scheduler = SGDRScheduler(min_lr=1e-6, max_lr=1e-4,
+    #                              initial_epoch=args.initial_epoch,
+    #                              steps_per_epoch=data_loader.steps_per_epoch,
+    #                              cycle_length=8,
+    #                              lr_decay=0.5,
+    #                              mult_factor=1.2)
 
     model.fit(data_loader.load_data(), epochs=1, steps_per_epoch=data_loader.steps_per_epoch,
               callbacks=[checkpoint, earlystop])
