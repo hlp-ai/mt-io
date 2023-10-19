@@ -80,12 +80,12 @@ if __name__ == "__main__":
 
     checkpoint = ModelCheckpoint(save_path, model=model, save_weights_only=True, monitor='loss', save_best_only=True)
     earlystop = EarlyStopping(patience=2, monitor='loss')
-    # lr_scheduler = SGDRScheduler(min_lr=1e-6, max_lr=1e-4,
-    #                              initial_epoch=args.initial_epoch,
-    #                              steps_per_epoch=data_loader.steps_per_epoch,
-    #                              cycle_length=8,
-    #                              lr_decay=0.5,
-    #                              mult_factor=1.2)
+    lr_scheduler = SGDRScheduler(min_lr=1e-6, max_lr=1e-4,
+                                 initial_epoch=args.initial_epoch,
+                                 steps_per_epoch=data_loader.steps_per_epoch,
+                                 cycle_length=8,
+                                 lr_decay=0.5,
+                                 mult_factor=1.2)
 
     model.fit(data_loader.load_data(), epochs=20, steps_per_epoch=data_loader.steps_per_epoch,
-              callbacks=[checkpoint, earlystop])
+              callbacks=[checkpoint, earlystop, lr_scheduler])
