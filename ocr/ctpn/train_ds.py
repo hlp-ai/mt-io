@@ -47,4 +47,4 @@ if __name__ == "__main__":
     #                              lr_decay=0.5,
     #                              mult_factor=1.2)
 
-    model.fit(ds, epochs=1,callbacks=[checkpoint, earlystop])
+    model.fit(ds, epochs=30,callbacks=[checkpoint, earlystop])
