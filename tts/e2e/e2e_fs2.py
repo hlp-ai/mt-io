@@ -2,8 +2,9 @@ import soundfile as sf
 
 import tensorflow as tf
 
-from tts.inference import TFAutoModel, AutoConfig
-from tts.inference import AutoProcessor
+from tts.inference.auto_config import AutoConfig
+from tts.inference.auto_model import TFAutoModel
+from tts.inference.auto_processor import AutoProcessor
 
 txt2mel_conf_fn = r"D:\kidden\mt\open\github\TensorFlowTTS\tensorflow_tts\bin\fastspeech2\conf\fastspeech2.baker.v2.yaml"
 print("Loading txt2mel config from", txt2mel_conf_fn)

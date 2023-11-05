@@ -8,7 +8,8 @@ import soundfile
 import tensorflow as tf
 from langid import langid
 
-from tts.inference import AutoProcessor, TFAutoModel
+from tts.inference.auto_model import TFAutoModel
+from tts.inference.auto_processor import AutoProcessor
 
 
 class Tacotron2MBGan:
