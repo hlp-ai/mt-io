@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 
 import tensorflow as tf
 
-from tts.inference import TFAutoModel
-from tts.inference import AutoProcessor
+from tts.inference.auto_model import TFAutoModel
+from tts.inference.auto_processor import AutoProcessor
 
 processor = AutoProcessor.from_pretrained("tensorspeech/tts-tacotron2-ljspeech-en")
 
