@@ -3,12 +3,21 @@ import matplotlib.pyplot as plt
 
 import tensorflow as tf
 
+from tts.inference.auto_config import AutoConfig
 from tts.inference.auto_model import TFAutoModel
 from tts.inference.auto_processor import AutoProcessor
 
-processor = AutoProcessor.from_pretrained("tensorspeech/tts-tacotron2-ljspeech-en")
+mapper_fn = r"D:\kidden\mt\open\github\mt-io\tts\processor\pretrained\baker_mapper.json"
+print("Loading mapper from", mapper_fn)
+processor = AutoProcessor.from_pretrained(mapper_fn)
 
-tacotron2 = TFAutoModel.from_pretrained("tensorspeech/tts-tacotron2-ljspeech-en")
+txt2mel_conf_fn = r"D:\kidden\mt\open\github\mt-io\tts\bin\tacotron2\conf\tacotron2.baker.v1.yaml"
+print("Loading txt2mel config from", txt2mel_conf_fn)
+txt2mel_conf = AutoConfig.from_pretrained(txt2mel_conf_fn)
+
+model_fn = r"D:\kidden\mt\tts\tacotron2\baker\model-24000.h5"
+print("Loading txt2mel model from", model_fn)
+tacotron2 = TFAutoModel.from_pretrained(model_fn, txt2mel_conf)
 
 tacotron2.setup_window(win_front=6, win_back=6)
 tacotron2.setup_maximum_iterations(3000)
@@ -20,8 +29,8 @@ tf.saved_model.save(tacotron2, "./test_saved", signatures=tacotron2.inference)
 # # Load and Inference
 tacotron2 = tf.saved_model.load("./test_saved")
 
-input_text = "Unless you work on a ship, it's unlikely that you use the word boatswain in everyday conversation, so it's understandably a tricky one. The word - which refers to a petty officer in charge of hull maintenance is not pronounced boats-wain Rather, it's bo-sun to reflect the salty pronunciation of sailors, as The Free Dictionary explains."
-input_ids = processor.text_to_sequence(input_text)
+input_text = "深度学习是目前自然语言处理的主流方法。"
+input_ids = processor.text_to_sequence(input_text, inference=True)
 
 decoder_output, mel_outputs, stop_token_prediction, alignment_history = tacotron2.inference(
     tf.expand_dims(tf.convert_to_tensor(input_ids, dtype=tf.int32), 0),
@@ -66,8 +75,8 @@ display_mel(mel_outputs)
 
 # # Let inference other input to check dynamic shape
 
-input_text = "The Commission further recommends that the Secret Service coordinate its planning as closely as possible with all of the Federal agencies from which it receives information."
-input_ids = processor.text_to_sequence(input_text)
+input_text = "语言合成效果和采用的方法息息相关，大家都是这样认为的吗？"
+input_ids = processor.text_to_sequence(input_text, inference=True)
 
 decoder_output, mel_outputs, stop_token_prediction, alignment_history = tacotron2.inference(
     tf.expand_dims(tf.convert_to_tensor(input_ids, dtype=tf.int32), 0),
