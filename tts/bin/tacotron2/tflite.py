@@ -5,11 +5,11 @@ from tts.inference import TFAutoModel, AutoConfig, AutoProcessor
 
 print(tf.__version__)
 
-txt2mel_conf_fn = r"D:\kidden\github\TensorFlowTTS\examples\tacotron2\conf\tacotron2.baker.v1.yaml"
+txt2mel_conf_fn = r"D:\kidden\mt\open\github\mt-io\tts\bin\tacotron2\conf\tacotron2.baker.v1.yaml"
 print("Loading txt2mel config from", txt2mel_conf_fn)
 txt2mel_conf = AutoConfig.from_pretrained(txt2mel_conf_fn)
 
-model_fn = r"D:\dataset\baker\baker\tacotron2\checkpoints\model-12000.h5"
+model_fn = r"D:\kidden\mt\tts\tacotron2\baker\model-24000.h5"
 print("Loading txt2mel model from", model_fn)
 tacotron2 = TFAutoModel.from_pretrained(model_fn, txt2mel_conf)
 
@@ -42,7 +42,7 @@ print('Model size is %f MBs.' % (len(tflite_model) / 1024 / 1024.0) )
 
 # # Inference from TFLite
 
-mapper_fn = r"D:\kidden\github\TensorFlowTTS\tensorflow_tts\processor\pretrained\baker_mapper.json"
+mapper_fn = r"D:\kidden\mt\open\github\mt-io\tts\processor\pretrained\baker_mapper.json"
 print("Loading mapper from", mapper_fn)
 processor = AutoProcessor.from_pretrained(mapper_fn)
 
