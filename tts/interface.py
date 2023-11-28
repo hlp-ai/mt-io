@@ -106,31 +106,31 @@ class Tacotron2MBMelGAN(TTS):
         return audio_after
 
 
-def test_baker():
-    txt2mel_conf_fn = r".\bin\tacotron2\conf\tacotron2.baker.v1.yaml"
-    txt2mel_model_fn = r"D:\dataset\baker\baker\tacotron2\checkpoints\model-20000.h5"
-    mel2wav_conf_fn = r".\bin\mbmelgan\conf\multiband_melgan.baker.v1.yaml"
+def tts_baker():
+    txt2mel_conf_fn = r"D:\kidden\mt\open\github\mt-io\tts\bin\tacotron2\conf\tacotron2.baker.v1.yaml"
+    txt2mel_model_fn = r"D:\kidden\mt\tts\tacotron2\baker\model-24000.h5"
+    mel2wav_conf_fn = r"D:\kidden\mt\open\github\mt-io\tts\bin\mbmelgan\conf\multiband_melgan.baker.v1.yaml"
     mel2wav_model_fn = r"D:\dataset\baker\baker\mbmelgan\checkpoints\generator-80000.h5"
-    mapper_fn = r".\processor\pretrained\baker_mapper.json"
+    mapper_fn = r"D:\kidden\mt\open\github\mt-io\tts\processor\pretrained\baker_mapper.json"
 
     tts = Tacotron2MBMelGAN(txt2mel_conf_fn, txt2mel_model_fn,
                             mel2wav_conf_fn, mel2wav_model_fn,
                             mapper_fn, "zh")
 
     while True:
-        text = input("输入要合成语音的文本: ")
+        text = input("输入要合成语音的中文文本: ")
 
         audio = tts.txt2wav(text)
 
         print("Saving wav...")
         tmp_wav_fn = os.path.join(tempfile.gettempdir(), str(hash(text)) + ".wav")
-        save_wav(audio, tmp_wav_fn, 22050)
+        save_wav(audio, tmp_wav_fn, 24000)
 
         print("Playing wav...")
         play_wav(tmp_wav_fn)
 
 
-def test_ljspeech():
+def tts_ljspeech():
     txt2mel_conf_fn = r".\bin\tacotron2\conf\tacotron2.v1.yaml"
     txt2mel_model_fn = r"D:\dataset\LJSpeech-1.1\tacotron2\run1\checkpoints\model-28000.h5"
     mel2wav_conf_fn = r".\bin\mbmelgan\conf\multiband_melgan.v1.yaml"
@@ -142,7 +142,7 @@ def test_ljspeech():
                             mapper_fn, "en")
 
     while True:
-        text = input("输入要合成语音的文本: ")
+        text = input("输入要合成语音的英文文本: ")
 
         audio = tts.txt2wav(text)
 
@@ -155,4 +155,4 @@ def test_ljspeech():
 
 
 if __name__ == "__main__":
-    test_ljspeech()
+    tts_baker()
