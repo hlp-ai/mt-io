@@ -4,10 +4,10 @@
 This example code show you how to train Tactron-2 from scratch with Tensorflow 2 based on custom training loop and tf.function. The data used for this example is LJSpeech, you can download the dataset at  [link](https://keithito.com/LJ-Speech-Dataset/).
 
 ### Step 1: Create Tensorflow based Dataloader (tf.dataset)
-First, you need define data loader based on AbstractDataset class (see [`abstract_dataset.py`](https://github.com/dathudeptrai/TensorflowTTS/blob/master/tensorflow_tts/datasets/abstract_dataset.py)). On this example, a dataloader read dataset from path. I use suffix to classify what file is a charactor and mel-spectrogram (see [`tacotron_dataset.py`](https://github.com/dathudeptrai/TensorflowTTS/blob/master/examples/tacotron2/tacotron_dataset.py)). If you already have preprocessed version of your target dataset, you don't need to use this example dataloader, you just need refer my dataloader and modify **generator function** to adapt with your case. Normally, a generator function should return [charactor_ids, char_length, mel, mel_length], here i also return guided attention (see [`DC_TTS`](https://arxiv.org/pdf/1710.08969.pdf)) to support training.
+First, you need define data loader based on AbstractDataset class (see abstract_dataset.py). On this example, a dataloader read dataset from path. I use suffix to classify what file is a charactor and mel-spectrogram (see tacotron_dataset.py). If you already have preprocessed version of your target dataset, you don't need to use this example dataloader, you just need refer my dataloader and modify **generator function** to adapt with your case. Normally, a generator function should return [charactor_ids, char_length, mel, mel_length], here i also return guided attention (see [`DC_TTS`](https://arxiv.org/pdf/1710.08969.pdf)) to support training.
 
 ### Step 2: Training from scratch
-After you redefine your dataloader, pls modify an input arguments, train_dataset and valid_dataset from [`train_tacotron2.py`](https://github.com/dathudeptrai/TensorflowTTS/blob/master/examples/tacotron2/train_tacotron2.py). Here is an example command line to training tacotron-2 from scratch:
+After you redefine your dataloader, pls modify an input arguments, train_dataset and valid_dataset from train_tacotron2.py. Here is an example command line to training tacotron-2 from scratch:
 
 ```bash
 CUDA_VISIBLE_DEVICES=0 python tts/bin/tacotron2/train_tacotron2.py \
@@ -102,7 +102,7 @@ After that, simply pass the argument `--fal 1` to the train_tacotron2.py script 
 
 
 ## Results
-Here is a result of tacotron2 based on this config [`tacotron2.v1.yaml`](https://github.com/dathudeptrai/TensorflowTTS/blob/tacotron-2-example/examples/tacotron-2/conf/tacotron2.v1.yaml) but with reduction_factor = 7, we will update learning curves for reduction_factor = 1.
+Here is a result of tacotron2 based on this config tacotron2.v1.yaml but with reduction_factor = 7, we will update learning curves for reduction_factor = 1.
 
 ### Alignments progress
 <img src="fig/alignment.gif" height="300">

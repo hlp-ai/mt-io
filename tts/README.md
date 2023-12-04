@@ -70,16 +70,13 @@ The preprocessing has two steps:
 
 To reproduce the steps above:
 ```
-tensorflow-tts-preprocess --rootdir ./[ljspeech/kss/baker/libritts/thorsten/synpaflex] --outdir ./dump_[ljspeech/kss/baker/libritts/thorsten/synpaflex] --config preprocess/[ljspeech/kss/baker/thorsten/synpaflex]_preprocess.yaml --dataset [ljspeech/kss/baker/libritts/thorsten/synpaflex]
-tensorflow-tts-normalize --rootdir ./dump_[ljspeech/kss/baker/libritts/thorsten/synpaflex] --outdir ./dump_[ljspeech/kss/baker/libritts/thorsten/synpaflex] --config preprocess/[ljspeech/kss/baker/libritts/thorsten/synpaflex]_preprocess.yaml --dataset [ljspeech/kss/baker/libritts/thorsten/synpaflex]
+tts/bin/preprocess --rootdir ./[ljspeech/kss/baker/libritts/thorsten/synpaflex] --outdir ./dump_[ljspeech/kss/baker/libritts/thorsten/synpaflex] --config preprocess/[ljspeech/kss/baker/thorsten/synpaflex]_preprocess.yaml --dataset [ljspeech/kss/baker/libritts/thorsten/synpaflex]
 ```
 
 Right now we only support [`ljspeech`](https://keithito.com/LJ-Speech-Dataset/), [`kss`](https://www.kaggle.com/bryanpark/korean-single-speaker-speech-dataset), [`baker`](https://weixinxcxdb.oss-cn-beijing.aliyuncs.com/gwYinPinKu/BZNSYP.rar), [`libritts`](http://www.openslr.org/60/), [`thorsten`](https://github.com/thorstenMueller/deep-learning-german-tts) and
 [`synpaflex`](https://www.ortolang.fr/market/corpora/synpaflex-corpus/) for dataset argument. In the future, we intend to support more datasets.
 
-**Note**: To run `libritts` preprocessing, please first read the instruction in [examples/fastspeech2_libritts](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/examples/fastspeech2_libritts). We need to reformat it first before run preprocessing.
-
-**Note**: To run `synpaflex` preprocessing, please first run the notebook [notebooks/prepare_synpaflex.ipynb](https://github.com/TensorSpeech/TensorFlowTTS/tree/master/notebooks/prepare_synpaflex.ipynb). We need to reformat it first before run preprocessing.
+**Note**: To run `libritts` preprocessing, please first read the instruction in bin/fastspeech2_libritts. We need to reformat it first before run preprocessing.
 
 After preprocessing, the structure of the project folder should be:
 ```
@@ -155,15 +152,15 @@ We use suffix (`ids`, `raw-feats`, `raw-energy`, `raw-f0`, `norm-feats`, and `wa
 
 To know how to train model from scratch or fine-tune with other datasets/languages, please see detail at example directory.
 
-- For Tacotron-2 tutorial, pls see [examples/tacotron2](https://github.com/tensorspeech/TensorFlowTTS/tree/master/examples/tacotron2)
-- For FastSpeech2 tutorial, pls see [examples/fastspeech2](https://github.com/tensorspeech/TensorFlowTTS/tree/master/examples/fastspeech2)
-- For FastSpeech2 + MFA tutorial, pls see [examples/fastspeech2_libritts](https://github.com/tensorspeech/TensorFlowTTS/tree/master/examples/fastspeech2_libritts)
-- For Multiband-MelGAN tutorial, pls see [examples/multiband_melgan](https://github.com/tensorspeech/TensorFlowTTS/tree/master/examples/multiband_melgan)
+- For Tacotron-2 tutorial, pls see bin/tacotron2
+- For FastSpeech2 tutorial, pls see bin/fastspeech2
+- For FastSpeech2 + MFA tutorial, pls see bin/fastspeech2_libritts
+- For Multiband-MelGAN tutorial, pls see multiband_melgan
 # Abstract Class Explaination
 
 ## Abstract DataLoader Tensorflow-based dataset
 
-A detail implementation of abstract dataset class from [tensorflow_tts/dataset/abstract_dataset](https://github.com/tensorspeech/TensorFlowTTS/blob/master/tensorflow_tts/datasets/abstract_dataset.py). There are some functions you need overide and understand:
+A detail implementation of abstract dataset class from dataset/abstract_dataset. There are some functions you need overide and understand:
 
 1. **get_args**: This function return argumentation for **generator** class, normally is utt_ids.
 2. **generator**: This function have an inputs from **get_args** function and return a inputs for models. **Note that we return a dictionary for all generator functions with the keys that exactly match with the model's parameters because base_trainer will use model(\*\*batch) to do forward step.**
@@ -176,21 +173,21 @@ A detail implementation of abstract dataset class from [tensorflow_tts/dataset/a
 - If you do shuffle before cache, the dataset won't shuffle when it re-iterate over datasets.
 - You should apply map_fn to make each element return from **generator** function have the same length before getting batch and feed it into a model.
 
-Some examples to use this **abstract_dataset** are [tacotron_dataset.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/tacotron2/tacotron_dataset.py), [fastspeech_dataset.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/fastspeech/fastspeech_dataset.py), [melgan_dataset.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/melgan/audio_mel_dataset.py), [fastspeech2_dataset.py](https://github.com/TensorSpeech/TensorFlowTTS/blob/master/examples/fastspeech2/fastspeech2_dataset.py)
+Some examples to use this **abstract_dataset** are tacotron_dataset.py, fastspeech_dataset.py, melgan_dataset.py, fastspeech2_dataset.py
 
 
 ## Abstract Trainer Class
 
-A detail implementation of base_trainer from [tensorflow_tts/trainer/base_trainer.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/tensorflow_tts/trainers/base_trainer.py). It include [Seq2SeqBasedTrainer](https://github.com/tensorspeech/TensorFlowTTS/blob/master/tensorflow_tts/trainers/base_trainer.py#L265) and [GanBasedTrainer](https://github.com/tensorspeech/TensorFlowTTS/blob/master/tensorflow_tts/trainers/base_trainer.py#L149) inherit from [BasedTrainer](https://github.com/tensorspeech/TensorFlowTTS/blob/master/tensorflow_tts/trainers/base_trainer.py#L16). All trainer support both single/multi GPU. There a some functions you **MUST** overide when implement new_trainer:
+A detail implementation of base_trainer from trainer/base_trainer.py. It include Seq2SeqBasedTrainer and GanBasedTrainer inherit from BasedTrainer. All trainer support both single/multi GPU. There a some functions you **MUST** overide when implement new_trainer:
 
 - **compile**: This function aim to define a models, and losses.
 - **generate_and_save_intermediate_result**: This function will save intermediate result such as: plot alignment, save audio generated, plot mel-spectrogram ...
 - **compute_per_example_losses**: This function will compute per_example_loss for model, note that all element of the loss **MUST** has shape [batch_size].
 
-All models on this repo are trained based-on **GanBasedTrainer** (see [train_melgan.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/melgan/train_melgan.py), [train_melgan_stft.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/melgan.stft/train_melgan_stft.py), [train_multiband_melgan.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/multiband_melgan/train_multiband_melgan.py)) and **Seq2SeqBasedTrainer** (see [train_tacotron2.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/tacotron2/train_tacotron2.py), [train_fastspeech.py](https://github.com/tensorspeech/TensorFlowTTS/blob/master/examples/fastspeech/train_fastspeech.py)).
+All models on this repo are trained based-on **GanBasedTrainer** (see train_melgan.py, train_melgan_stft.py, train_multiband_melgan.py) and **Seq2SeqBasedTrainer** (see train_tacotron2.py, train_fastspeech.py).
 
 # End-to-End Examples
-You can know how to inference each model at [notebooks](https://github.com/tensorspeech/TensorFlowTTS/tree/master/notebooks) or see a [colab](https://colab.research.google.com/drive/1akxtrLZHKuMiQup00tzO2olCaN-y3KiD?usp=sharing) (for English), [colab](https://colab.research.google.com/drive/1ybWwOS5tipgPFttNulp77P6DAB5MtiuN?usp=sharing) (for Korean), [colab](https://colab.research.google.com/drive/1YpSHRBRPBI7cnTkQn1UcVTWEQVbsUm1S?usp=sharing) (for Chinese), [colab](https://colab.research.google.com/drive/1jd3u46g-fGQw0rre8fIwWM9heJvrV1c0?usp=sharing) (for French), [colab](https://colab.research.google.com/drive/1W0nSFpsz32M0OcIkY9uMOiGrLTPKVhTy?usp=sharing) (for German). Here is an example code for end2end inference with fastspeech2 and multi-band melgan. We uploaded all our pretrained in [HuggingFace Hub](https://huggingface.co/tensorspeech).
+Here is an example code for end2end inference with fastspeech2 and multi-band melgan. 
 
 ```python
 import numpy as np
