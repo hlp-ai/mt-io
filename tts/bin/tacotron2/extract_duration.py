@@ -31,7 +31,6 @@ def main():
     """Running extract tacotron-2 durations."""
     parser = argparse.ArgumentParser(
         description="Extract durations from charactor with trained Tacotron-2 "
-        "(See detail in tensorflow_tts/example/tacotron-2/extract_duration.py)."
     )
     parser.add_argument(
         "--rootdir",

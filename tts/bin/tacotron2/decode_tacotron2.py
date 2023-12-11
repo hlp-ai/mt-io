@@ -18,7 +18,6 @@ def main():
     """Running decode tacotron-2 mel-spectrogram."""
     parser = argparse.ArgumentParser(
         description="Decode mel-spectrogram from folder ids with trained Tacotron-2 "
-        "(See detail in tensorflow_tts/example/tacotron2/decode_tacotron2.py)."
     )
     parser.add_argument(
         "--rootdir",
