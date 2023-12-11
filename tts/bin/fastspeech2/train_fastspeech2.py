@@ -274,7 +274,7 @@ def main():
     with open(args.config) as f:
         config = yaml.load(f, Loader=yaml.Loader)
     config.update(vars(args))
-    config["version"] = tts.__version__
+    # config["version"] = tts.__version__
     with open(os.path.join(args.outdir, "config.yml"), "w") as f:
         yaml.dump(config, f, Dumper=yaml.Dumper)
     for key, value in config.items():

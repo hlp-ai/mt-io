@@ -377,7 +377,7 @@ def main():
     with open(args.config) as f:
         config = yaml.load(f, Loader=yaml.Loader)
     config.update(vars(args))
-    config["version"] = tts.__version__
+    # config["version"] = tts.__version__
 
     # get dataset
     if config["remove_short_samples"]:
