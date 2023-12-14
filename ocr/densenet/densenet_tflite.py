@@ -38,16 +38,16 @@ model_with_preprocessing = Sequential([
 model_with_preprocessing.build((None, None, None, 3))
 model_with_preprocessing.summary()
 
-tf.saved_model.save(model_with_preprocessing, 'save')
+tf.saved_model.save(model_with_preprocessing, 'saved_model')
 
-converter = tf.lite.TFLiteConverter.from_saved_model('save')
+converter = tf.lite.TFLiteConverter.from_saved_model('saved_model')
 converter.target_spec.supported_ops = [
         tf.lite.OpsSet.TFLITE_BUILTINS,  # enable TFLite ops
         tf.lite.OpsSet.SELECT_TF_OPS,  # enable TF ops
     ]
 tflite_model = converter.convert()
 
-with open('save_model.tflite', 'wb') as f:
+with open('desenet.tflite', 'wb') as f:
     f.write(tflite_model)
 
 
