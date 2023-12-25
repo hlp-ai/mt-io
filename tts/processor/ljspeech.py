@@ -1,9 +1,6 @@
 """Perform preprocessing and raw feature extraction for LJSpeech dataset."""
 
 import os
-import re
-
-from g2p_en import G2p
 
 import numpy as np
 import soundfile as sf
@@ -113,13 +110,6 @@ LJSPEECH_SYMBOLS = (
     [_pad] + list(_special) + list(_punctuation) + list(_letters) + _arpabet + [_eos]
 )
 
-# Regular expression matching text enclosed in curly braces:
-# _curly_re = re.compile(r"(.*?)\{(.+?)\}(.*)")
-_curly_re = re.compile(r"\{(.+?)\}")
-
-
-g2p = G2p()
-
 
 @dataclass
 class LJSpeechProcessor(BaseProcessor):
@@ -156,8 +146,6 @@ class LJSpeechProcessor(BaseProcessor):
     def get_one_sample(self, item):
         text, wav_path, speaker_name = item
 
-        text = self.get_phoneme(text)
-
         # normalize audio signal to be [-1, 1], soundfile already norm.
         audio, rate = sf.read(wav_path)
         audio = audio.astype(np.float32)
@@ -177,26 +165,7 @@ class LJSpeechProcessor(BaseProcessor):
         return sample
 
     def text_to_sequence(self, text, inference=True):
-        sequence = []
-        # Check for curly braces and treat their contents as ARPAbet:
-        # while len(text):
-        #     m = _curly_re.match(text)
-        #     if not m:
-        #         sequence += self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
-        #         break
-        #     sequence += self._symbols_to_sequence(self._clean_text(m.group(1), [self.cleaner_names]))
-        #     sequence += self._arpabet_to_sequence(m.group(2))
-        #     text = m.group(3)
-
-        m = _curly_re.match(text)
-        if not m:
-            sequence += self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
-        else:
-            phoneme = m.group(1)
-            if inference:
-                print(phoneme)
-            sequence += self._arpabet_to_sequence(phoneme)
-
+        sequence = self._symbols_to_sequence(self._clean_text(text, [self.cleaner_names]))
         # add eos tokens
         sequence += [self.eos_id]
 
@@ -213,30 +182,10 @@ class LJSpeechProcessor(BaseProcessor):
     def _symbols_to_sequence(self, symbols):
         return [self.symbol_to_id[s] for s in symbols if self._should_keep_symbol(s)]
 
-    def _arpabet_to_sequence(self, text):
-        return self._symbols_to_sequence(["@" + s if s not in _punctuation else s for s in text.split()])
-
     def _should_keep_symbol(self, s):
         return s in self.symbol_to_id and s != "_" and s != "~"
 
-    def txt2phoneme(self, txt):
-        return " ".join(g2p(txt))
-
-    def get_phoneme(self, txt):
-        return "{" + self.txt2phoneme(txt) + "}"
-
 
 if __name__ == "__main__":
-    preprocessor = LJSpeechProcessor(data_dir=None, symbols=LJSPEECH_SYMBOLS)
-    txt = "This is a book, and I like it."
-    ids = preprocessor.text_to_sequence(txt)
-    print(ids)
-    symbols = [preprocessor.id_to_symbol[id] for id in ids]
-    print(symbols)
-
-    pron = preprocessor.get_phoneme(txt)
-    print(pron)
-    ids = preprocessor.text_to_sequence(pron)
-    print(ids)
-    symbols = [preprocessor.id_to_symbol[id] for id in ids]
-    print(symbols)
+    preprocessor = LJSpeechProcessor(r"D:\dataset\LJSpeech-1.1", symbols=LJSPEECH_SYMBOLS)
+    print(preprocessor.text_to_sequence("This is a book."))
