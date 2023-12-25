@@ -187,5 +187,9 @@ class LJSpeechProcessor(BaseProcessor):
 
 
 if __name__ == "__main__":
-    preprocessor = LJSpeechProcessor(r"D:\dataset\LJSpeech-1.1", symbols=LJSPEECH_SYMBOLS)
+    preprocessor = LJSpeechProcessor(data_dir=r"D:\dataset\LJSpeech-1.1", symbols=LJSPEECH_SYMBOLS)
     print(preprocessor.text_to_sequence("This is a book."))
+
+    for i in range(5):
+        print(preprocessor.items[i])
+        print(preprocessor.get_one_sample(preprocessor.items[i]))
