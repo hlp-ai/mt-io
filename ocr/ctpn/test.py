@@ -7,50 +7,43 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.special import softmax
 
-from ocr.ctpn.lib import utils2
-from ocr.ctpn.lib.text_proposal_connector_oriented2 import TextProposalConnectorOriented
+from ocr.ctpn.lib import utils3
+from ocr.ctpn.lib.TextProposalConnectorOriented2 import TextProposalConnectorOriented
 from ocr.ctpn.model import get_model
 
 
-
+@tf.function
 def post_process(cls_prod, regr, h, w):
-    graph = tf.Graph()
-    with graph.as_default():
+    # 生成基础锚框
+    anchor = utils3.gen_anchor([int(h / 16), int(w / 16)], 16)
 
-        # 生成基础锚框
-        anchor = tf.py_function(utils2.gen_anchor, [(int(h / 16), int(w / 16)), 16], tf.float32)
+    # 得到预测框
+    bbox = utils3.bbox_transfor_inv(anchor, regr)
 
-        # 得到预测框
-        bbox = tf.py_function(utils2.bbox_transfor_inv, [anchor, regr], tf.float32)
+    # 切掉图片范围外的部分
+    bbox = utils3.clip_box(bbox, [h, w])
 
-        # 切掉图片范围外的部分
-        bbox = tf.py_function(utils2.clip_box, [bbox, [h, w]], tf.float32)
+    # score > 0.7
+    fg = tf.where(cls_prod[0, :, 1] > utils3.IOU_SELECT)[:, 0]
+    select_anchor = tf.gather(bbox, fg)
+    select_score = tf.gather(cls_prod[0, :, 1], fg)
+    select_anchor = tf.cast(select_anchor, tf.int32)
 
-        # score > 0.7
-        fg = tf.where(cls_prod[0, :, 1] > utils2.IOU_SELECT)[:, 0]
-        select_anchor = tf.gather(bbox, fg)
-        select_score = tf.gather(cls_prod[0, :, 1], fg)
-        select_anchor = tf.cast(select_anchor, tf.int32)
+    # filter size
+    keep_index = utils3.filter_bbox(select_anchor, 16)
 
-        # filter size
-        keep_index = tf.py_function(utils2.filter_bbox, [select_anchor, 16], tf.int32)
+    # nms
+    select_anchor = tf.gather(select_anchor, keep_index)
+    select_score = tf.gather(select_score, keep_index)
+    select_score = tf.reshape(select_score, (-1, 1))
+    nmsbox = tf.concat([tf.cast(select_anchor, tf.float32), select_score], axis=1)
+    keep = utils3.nms(nmsbox, 1 - utils3.IOU_SELECT)
+    select_anchor = tf.gather(select_anchor, keep)
+    select_score = tf.gather(select_score, keep)
 
-        # nms
-        select_anchor = tf.gather(select_anchor, keep_index)
-        select_score = tf.gather(select_score, keep_index)
-        select_score = tf.reshape(select_score, (-1, 1))
-        nmsbox = tf.concat([tf.cast(select_anchor, tf.float32), select_score], axis=1)
-        keep = tf.py_function(utils2.nms, [nmsbox, 1 - utils2.IOU_SELECT], tf.int32)
-        select_anchor = tf.gather(select_anchor, keep)
-        select_score = tf.gather(select_score, keep)
-
-        # text line
-        textConn = TextProposalConnectorOriented()
-        text_rects = tf.py_function(textConn.get_text_lines, [select_anchor, select_score, [h, w]], tf.int32)
-
-    with tf.compat.v1.Session(graph=graph) as sess:
-        # 运行计算图中的操作节点
-        text_rects = sess.run(text_rects)
+    # text line
+    textConn = TextProposalConnectorOriented()
+    text_rects = textConn.get_text_lines(select_anchor, select_score, [h, w])
 
     return text_rects
 
@@ -73,7 +66,7 @@ def predict(model, image, output_path=None, mode=1):
         img = transform_img
 
     # 和训练数据一样规范化
-    m_img = img - utils2.IMAGE_MEAN
+    m_img = img - utils3.IMAGE_MEAN
     m_img = np.expand_dims(m_img, axis=0)
 
     # cls, regr, cls_prod = model.predict_on_batch(m_img)
@@ -82,6 +75,7 @@ def predict(model, image, output_path=None, mode=1):
 
     # 计算文本框列表
     text_rects = post_process(cls_prod, regr, h, w)
+
     return text_rects
 
 
@@ -105,6 +99,7 @@ if __name__ == "__main__":
 
     predict_model = get_model()  # 创建模型, 不需加载基础模型权重
     predict_model.load_weights(weight_path)  # 加载模型权重
-    text_rects = predict(predict_model, image_path, output_path=output_file_path)
-    print(text_rects)
+    result = predict(predict_model, image_path, output_path=output_file_path)
+    print(result)
+
 
