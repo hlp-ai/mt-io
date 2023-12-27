@@ -6,7 +6,7 @@ from tts.inference.auto_config import AutoConfig
 from tts.inference.auto_model import TFAutoModel
 from tts.inference.auto_processor import AutoProcessor
 
-txt2mel_conf_fn = r"D:\kidden\mt\open\github\TensorFlowTTS\tensorflow_tts\bin\fastspeech2\conf\fastspeech2.baker.v2.yaml"
+txt2mel_conf_fn = r"D:\kidden\mt\open\github\mt-io\tts\bin\fastspeech2\conf\fastspeech2.baker.v2.yaml"
 print("Loading txt2mel config from", txt2mel_conf_fn)
 txt2mel_conf = AutoConfig.from_pretrained(txt2mel_conf_fn)
 
@@ -14,7 +14,7 @@ model_fn = r"D:\dataset\baker\baker\fastspeech2\checkpoints\model-80000.h5"
 print("Loading txt2mel model from", model_fn)
 txt2mel = TFAutoModel.from_pretrained(model_fn, txt2mel_conf)
 
-mel2wav_conf_fn = r"D:\kidden\github\TensorFlowTTS\examples\multiband_melgan\conf\multiband_melgan.baker.v1.yaml"
+mel2wav_conf_fn = r"D:\kidden\mt\open\github\mt-io\tts\bin\mbmelgan\conf\multiband_melgan.baker.v1.yaml"
 print("Loading mel2wav config from", mel2wav_conf_fn)
 mel2wav_conf = AutoConfig.from_pretrained(mel2wav_conf_fn)
 
@@ -22,7 +22,7 @@ model_fn2 = r"D:\dataset\baker\baker\mbmelgan\checkpoints\generator-80000.h5"
 print("Loading mel2wav model from", model_fn2)
 mel2wav = TFAutoModel.from_pretrained(model_fn2, mel2wav_conf)
 
-mapper_fn = r"D:\kidden\github\TensorFlowTTS\tensorflow_tts\processor\pretrained\baker_mapper.json"
+mapper_fn = r"D:\kidden\mt\open\github\mt-io\tts\processor\pretrained\baker_mapper.json"
 print("Loading mapper from", mapper_fn)
 processor = AutoProcessor.from_pretrained(mapper_fn)
 
