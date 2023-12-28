@@ -4,7 +4,7 @@ import tensorflow as tf
 
 from ocr.custom import LRScheduler
 from ocr.densenet.data_reader import OCRDataset, load_dict_sp
-from model_with_process import get_model_with_process
+from ocr.densenet.model_with_process import get_model_with_process
 
 
 if __name__ == '__main__':

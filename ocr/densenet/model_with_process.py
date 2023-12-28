@@ -13,10 +13,6 @@ class ProcessLayer(tf.keras.layers.Layer):
     def __init__(self, **kwargs):
         super(ProcessLayer, self).__init__(**kwargs)
 
-    @tf.function
-    def build(self, input_shape):
-        super(ProcessLayer, self).build(input_shape)
-
     @tf.function(
         experimental_relax_shapes=True,
     )

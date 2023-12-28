@@ -1,4 +1,4 @@
-from model_with_process import get_model_with_process
+from ocr.densenet.model_with_process import get_model_with_process
 import tensorflow as tf
 from ocr.densenet.data_reader import OCRDataset, load_dict_sp
 
