@@ -13,14 +13,11 @@ class ProcessLayer(tf.keras.layers.Layer):
     def __init__(self, **kwargs):
         super(ProcessLayer, self).__init__(**kwargs)
 
-    @tf.function(
-        experimental_relax_shapes=True,
-    )
+    @tf.function(experimental_relax_shapes=True)
     def call(self, input_img, **kwargs):
-        if tf.shape(input_img)[-1] == 3:
-            print("convert to gray image")
+        channels = tf.shape(input_img)[-1]
+        if channels == 3:
             input_img = tf.image.rgb_to_grayscale(input_img)
-        # input_img = tf.image.rgb_to_grayscale(input_img)
 
         original_shape = tf.shape(input_img)
         original_height = original_shape[1]
@@ -28,14 +25,15 @@ class ProcessLayer(tf.keras.layers.Layer):
         new_width = original_width * 32 // original_height
 
         input_img = tf.image.resize(input_img, [32, new_width])
-        input_img = tf.cast(input_img, tf.float32)
+        # 获取图片所有像素点的最大值和最小值
+        max_value = tf.reduce_max(input_img)
+        min_value = tf.reduce_min(input_img)
+        # 将图片像素点的值归一化到[-0.5, 0.5]之间
+        input_img = (input_img - min_value) / (max_value - min_value) - 0.5
+        # if channels == 3:
+        #     input_img = tf.image.rgb_to_grayscale(input_img)
 
-        input_img = input_img / 255.0 - 0.5
-
-        # input_img = tf.expand_dims(input_img, -1)
-        # 将input_img的channel改为1
-        input_img = tf.reshape(input_img, [original_shape[0], 32, new_width, 1])
-
+        input_img.set_shape([None, None, None, 1])
         return input_img
 
 

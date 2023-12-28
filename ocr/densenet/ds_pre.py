@@ -41,6 +41,7 @@ def predict(model, image, id_to_char, num_classes):
         img = image
 
     # X = single_img_process(img)
+    img = np.array(img)
     X = np.array([img])
 
     y_pred = model.predict(X)
