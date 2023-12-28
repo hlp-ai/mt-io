@@ -6,8 +6,6 @@ import os
 
 import tensorflow as tf
 from tqdm import tqdm
-
-from tts.optimizers import GradientAccumulator
 from tts.utils import utils
 
 
@@ -195,10 +193,6 @@ class GanBasedTrainer(BasedTrainer):
         self._is_discriminator_mixed_precision = is_discriminator_mixed_precision
         self._strategy = strategy
         self._already_apply_input_signature = False
-        self._generator_gradient_accumulator = GradientAccumulator()
-        self._discriminator_gradient_accumulator = GradientAccumulator()
-        self._generator_gradient_accumulator.reset()
-        self._discriminator_gradient_accumulator.reset()
 
     def init_train_eval_metrics(self, list_metrics_name):
         with self._strategy.scope():
@@ -625,10 +619,6 @@ class Seq2SeqBasedTrainer(BasedTrainer, metaclass=abc.ABCMeta):
 
         # check if we already apply input_signature for train_step.
         self._already_apply_input_signature = False
-
-        # create gradient accumulator
-        self._gradient_accumulator = GradientAccumulator()
-        self._gradient_accumulator.reset()
 
     def init_train_eval_metrics(self, list_metrics_name):
         with self._strategy.scope():

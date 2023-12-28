@@ -13,7 +13,6 @@ import sys
 import numpy as np
 import yaml
 
-import tts
 from tts.bin.tacotron2.tacotron_dataset import CharactorMelDataset
 from tts.configs.tacotron2 import Tacotron2Config
 from tts.models import TFTacotron2

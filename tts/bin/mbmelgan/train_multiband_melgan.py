@@ -15,7 +15,6 @@ import numpy as np
 import soundfile as sf
 import yaml
 
-import tts
 from tts.bin.mbmelgan.audio_mel_dataset import AudioMelDataset
 from tts.bin.mbmelgan.train_melgan import MelganTrainer, collater
 from tts.configs import (
