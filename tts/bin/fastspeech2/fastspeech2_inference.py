@@ -15,20 +15,11 @@ from tts.inference import TFAutoModel
 from tts.inference import AutoProcessor
 
 
-# In[2]:
-
-
 processor = AutoProcessor.from_pretrained("tensorspeech/tts-fastspeech2-ljspeech-en")
-
-
-# In[3]:
 
 
 input_text = "i love you so much."
 input_ids = processor.text_to_sequence(input_text)
-
-
-# In[4]:
 
 
 fastspeech2 = TFAutoModel.from_pretrained("tensorspeech/tts-fastspeech2-ljspeech-en")
@@ -36,29 +27,17 @@ fastspeech2 = TFAutoModel.from_pretrained("tensorspeech/tts-fastspeech2-ljspeech
 
 # # Save to Pb
 
-# In[5]:
-
-
 # save model into pb and do inference. Note that signatures should be a tf.function with input_signatures.
 tf.saved_model.save(fastspeech2, "./test_saved", signatures=fastspeech2.inference)
 
 
 # # Load and Inference
 
-# In[6]:
-
-
 fastspeech2 = tf.saved_model.load("./test_saved")
-
-
-# In[7]:
-
 
 input_text = "There’s a way to measure the acute emotional intelligence that has never gone out of style."
 input_ids = processor.text_to_sequence(input_text)
 
-
-# In[8]:
 
 
 mel_before, mel_after, duration_outputs, _, _ = fastspeech2.inference(
@@ -68,9 +47,6 @@ mel_before, mel_after, duration_outputs, _, _ = fastspeech2.inference(
     f0_ratios =tf.convert_to_tensor([1.0], dtype=tf.float32),
     energy_ratios =tf.convert_to_tensor([1.0], dtype=tf.float32)
 )
-
-
-# In[9]:
 
 
 mel_after = tf.reshape(mel_after, [-1, 80]).numpy()
@@ -85,14 +61,10 @@ plt.close()
 
 # # Let inference other input to check dynamic shape
 
-# In[10]:
-
 
 input_text = "The Commission further recommends that the Secret Service coordinate its planning as closely as possible with all of the Federal agencies from which it receives information."
 input_ids = processor.text_to_sequence(input_text)
 
-
-# In[11]:
 
 
 mel_before, mel_after, duration_outputs, _, _ = fastspeech2.inference(
@@ -102,9 +74,6 @@ mel_before, mel_after, duration_outputs, _, _ = fastspeech2.inference(
     f0_ratios =tf.convert_to_tensor([1.0], dtype=tf.float32),
     energy_ratios =tf.convert_to_tensor([1.0], dtype=tf.float32)
 )
-
-
-# In[12]:
 
 
 mel_after = tf.reshape(mel_after, [-1, 80]).numpy()
