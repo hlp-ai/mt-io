@@ -31,10 +31,10 @@ def test_fastspeech_resize_positional_embeddings(new_size):
 @pytest.mark.parametrize(
     "var_train_expr, config_path",
     [
-        (None, "../tensorflow_tts/bin/fastspeech2/conf/fastspeech2.v1.yaml"),
-        ("embeddings|encoder", "../tensorflow_tts/bin/fastspeech2/conf/fastspeech2.v1.yaml"),
-        ("embeddings|encoder", "../tensorflow_tts/bin/fastspeech2/conf/fastspeech2.v2.yaml"),
-        ("embeddings|encoder", "../tensorflow_tts/bin/fastspeech2/conf/fastspeech2.baker.v2.yaml"),
+        (None, "../bin/fastspeech2/conf/fastspeech2.v1.yaml"),
+        ("embeddings|encoder", "../bin/fastspeech2/conf/fastspeech2.v1.yaml"),
+        ("embeddings|encoder", "../bin/fastspeech2/conf/fastspeech2.v2.yaml"),
+        ("embeddings|encoder", "../bin/fastspeech2/conf/fastspeech2.baker.v2.yaml"),
     ],
 )
 def test_fastspeech2_train_some_layers(var_train_expr, config_path):
