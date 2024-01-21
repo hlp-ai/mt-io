@@ -211,17 +211,17 @@ class GanBasedTrainer(BasedTrainer):
         """Set generator class model (MUST)."""
         self._generator = generator_model
 
-    def get_gen_model(self):
-        """Get generator model."""
-        return self._generator
+    # def get_gen_model(self):
+    #     """Get generator model."""
+    #     return self._generator
 
     def set_dis_model(self, discriminator_model):
         """Set discriminator class model (MUST)."""
         self._discriminator = discriminator_model
 
-    def get_dis_model(self):
-        """Get discriminator model."""
-        return self._discriminator
+    # def get_dis_model(self):
+    #     """Get discriminator model."""
+    #     return self._discriminator
 
     def set_gen_optimizer(self, generator_optimizer):
         """Set generator optimizer (MUST)."""
@@ -556,14 +556,14 @@ class GanBasedTrainer(BasedTrainer):
         if self.steps >= self.config["train_max_steps"]:
             self.finish_train = True
 
-        if (
-            self.steps != 0
-            and self.steps == self.config["discriminator_train_start_steps"]
-        ):
-            self.finish_train = True
-            logging.info(
-                f"Finished training only generator at {self.steps}steps, pls resume and continue training."
-            )
+        # if (
+        #     self.steps != 0
+        #     and self.steps == self.config["discriminator_train_start_steps"]
+        # ):
+        #     self.finish_train = True
+        #     logging.info(
+        #         f"Finished training only generator at {self.steps}steps, pls resume and continue training."
+        #     )
 
     def _check_log_interval(self):
         """Log to tensorboard."""
