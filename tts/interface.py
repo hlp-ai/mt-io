@@ -69,8 +69,8 @@ class Tacotron2MBMelGAN(TTS):
         return self.lang
 
     def txt2wav(self, txt):
-        if isinstance(self.processor, LJSpeechProcessor):
-            txt = self.processor.get_phoneme(txt)
+        # if isinstance(self.processor, LJSpeechProcessor):
+        #     txt = self.processor.get_phoneme(txt)
 
         input_ids = self.processor.text_to_sequence(txt, inference=True)
 
@@ -131,8 +131,8 @@ def tts_baker():
 
 
 def tts_ljspeech():
-    txt2mel_conf_fn = r".\bin\tacotron2\conf\tacotron2.v1.yaml"
-    txt2mel_model_fn = r"D:\dataset\LJSpeech-1.1\tacotron2\run1\checkpoints\model-28000.h5"
+    txt2mel_conf_fn = r"D:\kidden\mt\tts\lj-tacotron2\config.yml"
+    txt2mel_model_fn = r"D:\kidden\mt\tts\lj-tacotron2\checkpoints\model-30000.h5"
     mel2wav_conf_fn = r".\bin\mbmelgan\conf\multiband_melgan.v1.yaml"
     mel2wav_model_fn = r"D:\dataset\LJSpeech-1.1\mbmelgan\run2\checkpoints\generator-152000.h5"
     mapper_fn = r".\processor\pretrained\ljspeech_mapper.json"
@@ -155,4 +155,5 @@ def tts_ljspeech():
 
 
 if __name__ == "__main__":
-    tts_baker()
+    tts_ljspeech()
+    # tts_baker()

@@ -10,7 +10,7 @@ txt2mel_conf_fn = r"D:\kidden\mt\open\github\mt-io\tts\bin\fastspeech2\conf\fast
 print("Loading txt2mel config from", txt2mel_conf_fn)
 txt2mel_conf = AutoConfig.from_pretrained(txt2mel_conf_fn)
 
-model_fn = r"D:\dataset\baker\baker\fastspeech2\checkpoints\model-80000.h5"
+model_fn = r"D:\dataset\baker\baker\fastspeech2\checkpoints\model-160000.h5"
 print("Loading txt2mel model from", model_fn)
 txt2mel = TFAutoModel.from_pretrained(model_fn, txt2mel_conf)
 
