@@ -18,10 +18,8 @@ from tqdm import tqdm
 
 from tts.processor import LJSpeechProcessor
 from tts.processor import BakerProcessor
-from tts.processor import LibriTTSProcessor
 from tts.processor.ljspeech import LJSPEECH_SYMBOLS
 from tts.processor.baker import BAKER_SYMBOLS
-from tts.processor.libritts import LIBRITTS_SYMBOLS
 
 from tts.utils import remove_outlier
 
@@ -328,13 +326,11 @@ def preprocess(config):
 
     dataset_processor = {
         "ljspeech": LJSpeechProcessor,
-        "libritts": LibriTTSProcessor,
         "baker": BakerProcessor,
     }
 
     dataset_symbol = {
         "ljspeech": LJSPEECH_SYMBOLS,
-        "libritts": LIBRITTS_SYMBOLS,
         "baker": BAKER_SYMBOLS,
     }
 

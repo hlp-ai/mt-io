@@ -6,14 +6,12 @@ from collections import OrderedDict
 from tts.processor import (
     LJSpeechProcessor,
     BakerProcessor,
-    LibriTTSProcessor,
 )
 
 CONFIG_MAPPING = OrderedDict(
     [
         ("LJSpeechProcessor", LJSpeechProcessor),
         ("BakerProcessor", BakerProcessor),
-        ("LibriTTSProcessor", LibriTTSProcessor),
     ]
 )
 

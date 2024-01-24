@@ -3,7 +3,6 @@
 from tts.configs import BaseConfig
 from tts.processor.ljspeech import LJSPEECH_SYMBOLS as lj_symbols
 from tts.processor.baker import BAKER_SYMBOLS as bk_symbols
-from tts.processor.libritts import LIBRITTS_SYMBOLS as lbri_symbols
 
 
 class Tacotron2Config(BaseConfig):
@@ -46,8 +45,6 @@ class Tacotron2Config(BaseConfig):
             self.vocab_size = vocab_size
         elif dataset == "baker":
             self.vocab_size = len(bk_symbols)
-        elif dataset == "libritts":
-            self.vocab_size = len(lbri_symbols)
         else:
             raise ValueError("No such dataset: {}".format(dataset))
         self.embedding_hidden_size = embedding_hidden_size

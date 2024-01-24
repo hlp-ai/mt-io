@@ -5,7 +5,6 @@ import collections
 from tts.configs import BaseConfig
 from tts.processor.ljspeech import LJSPEECH_SYMBOLS as lj_symbols
 from tts.processor.baker import BAKER_SYMBOLS as bk_symbols
-from tts.processor.libritts import LIBRITTS_SYMBOLS as lbri_symbols
 
 
 SelfAttentionParams = collections.namedtuple(
