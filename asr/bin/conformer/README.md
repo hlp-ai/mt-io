@@ -2,19 +2,17 @@
 
 Reference: [https://arxiv.org/abs/2005.08100](https://arxiv.org/abs/2005.08100)
 
-![Conformer Architecture](./figs/arch.png)
-
 ## Example Model YAML Config
 
 Go to [config.yml](./config.yml)
 
 ## Usage
 
-Training, see `python examples/conformer/train.py --help`
+Training, see `python bin/conformer/train.py --help`
 
-Testing, see `python examples/conformer/test.py --help`
+Testing, see `python bin/conformer/test.py --help`
 
-TFLite Conversion, see `python examples/conformer/inference/gen_tflite_model.py --help`
+TFLite Conversion, see `python bin/conformer/inference/gen_tflite_model.py --help`
 
 ## Conformer Subwords - Results on LibriSpeech
 
@@ -26,12 +24,6 @@ TFLite Conversion, see `python examples/conformer/inference/gen_tflite_model.py 
 - Number of parameters: 10,341,639
 - Positional Encoding Type: sinusoid concatenation
 - Trained on: 4 RTX 2080Ti 11G
-
-**Pretrained and Config**, go to [drive](https://drive.google.com/drive/folders/1VAihgSB5vGXwIVTl3hkUk95joxY1YbfW?usp=sharing)
-
-**Transducer Loss**
-
-<img src="./figs/subword_conformer_loss.svg" alt="conformer_subword" width="300px" />
 
 **Error Rates**
 
