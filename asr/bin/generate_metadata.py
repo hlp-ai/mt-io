@@ -1,3 +1,4 @@
+"""3. 产生语料样本数和最长语音和文本长度"""
 import os
 import argparse
 from asr.configs.config import Config

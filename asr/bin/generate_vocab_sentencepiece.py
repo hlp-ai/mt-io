@@ -1,3 +1,4 @@
+"""2. 创建文本SP模型"""
 import os
 import argparse
 from asr.utils.env_util import setup_environment, setup_strategy

@@ -1,3 +1,4 @@
+"""2. 从文本创建字符字典"""
 import argparse
 from tqdm.auto import tqdm
 

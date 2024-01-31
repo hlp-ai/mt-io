@@ -1,3 +1,4 @@
+"""1. 从librispeech语料创建转写或元数据文件"""
 import os
 import glob
 import argparse

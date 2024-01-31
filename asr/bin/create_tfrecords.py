@@ -1,3 +1,4 @@
+"""4. 创建TFRecord数据集"""
 import os
 import argparse
 from asr.configs.config import Config
