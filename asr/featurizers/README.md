@@ -15,13 +15,6 @@ There are 2 classes for Speech Features Extraction: `SpeechFeaturizer` (uses `li
 
 _Note_: `TFSpeechFeaturizer` class **should be used** if you want to deploy `tflite`.
 
-![Spectrogram](./figs/spectrogram.png)
-
-![Log Mel Spectrogram](./figs/log_mel_spectrogram.png)
-
-![MFCCs](./figs/mfcc.png)
-
-![Log Gammatone Spectrogram](./figs/log_gammatone_spectrogram.png)
 
 ## Text Features
 
