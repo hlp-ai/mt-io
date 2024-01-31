@@ -34,19 +34,6 @@ def setup_devices(devices: List[int], cpu: bool = False):
             logger.info(f"Run on {len(visible_gpus)} Physical GPUs")
 
 
-def setup_tpu(tpu_address=None):
-    if tpu_address is None:
-        resolver = tf.distribute.cluster_resolver.TPUClusterResolver()
-    else:
-        resolver = tf.distribute.cluster_resolver.TPUClusterResolver(
-            tpu="grpc://" + tpu_address
-        )
-    tf.config.experimental_connect_to_cluster(resolver)
-    tf.tpu.experimental.initialize_tpu_system(resolver)
-    logger.info(f"All TPUs: {tf.config.list_logical_devices('TPU')}")
-    return tf.distribute.experimental.TPUStrategy(resolver)
-
-
 def setup_strategy(devices: List[int], tpu_address: str = None):
     """Setting mirrored strategy for training
 
@@ -55,13 +42,8 @@ def setup_strategy(devices: List[int], tpu_address: str = None):
         tpu_address (str): an optional custom tpu address
 
     Returns:
-        tf.distribute.Strategy: TPUStrategy for training on tpus or MirroredStrategy for training on gpus
+        tf.distribute.Strategy: MirroredStrategy for training on gpus
     """
-    try:
-        return setup_tpu(tpu_address)
-    except (ValueError, tf.errors.NotFoundError) as e:
-        logger.warn(e)
-        pass
     setup_devices(devices)
     return tf.distribute.MirroredStrategy()
 
