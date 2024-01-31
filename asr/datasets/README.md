@@ -1,19 +1,19 @@
-# Dataset Structures :kissing:
+# Dataset Structures
 
 To make a custom dataset, inherit the `BaseDataset` class and override following methods:
 
 1. `create` to create `tf.data.Dataset` instance.
 2. `parse` for transforming `tf.data.Dataset` during creation by applyting `tf.data.Dataset.map` function.
 
-_Note_: To create transcripts for **librispeech**, see [create_librispeech_trans.py](../../scripts/create_librispeech_trans.py)
+_Note_: To create transcripts for **librispeech**, see [create_librispeech_trans.py](../bin/create_librispeech_trans.py)
 
 ## ASR Datasets
 
 An ASR dataset is some `.tsv` files in format: `PATH\tDURATION\tTRANSCRIPT`. You must create those files by your own with your own data and methods.
 
-**Note**: Each `.tsv` file must include a header `PATH\tDURATION\tTRANSCRIPT` because it will remove these headers when loading dataset, otherwise you will lose 1 data file :sob:
+**Note**: Each `.tsv` file must include a header `PATH\tDURATION\tTRANSCRIPT` because it will remove these headers when loading dataset, otherwise you will lose 1 data file.
 
-**For transcript**, if you want to include characters such as dots, commas, double quote, etc.. you must create your own `.txt` vocabulary file. Default is [English](../featurizers/english.txt)
+**For transcript**, if you want to include characters such as dots, commas, double quote, etc.. you must create your own `.txt` vocabulary file.
 
 **Inputs**
 
