@@ -9,15 +9,6 @@ logger = tf.get_logger()
 
 LOG_0 = float("-inf")
 
-try:
-    from warprnnt_tensorflow import rnnt_loss as warp_rnnt_loss
-
-    use_warprnnt = True
-    logger.info("Use RNNT loss in WarpRnnt")
-except ImportError:
-    logger.info("Use RNNT loss in TensorFlow")
-    use_warprnnt = False
-
 
 class RnntLoss(tf.keras.losses.Loss):
     def __init__(
@@ -51,37 +42,13 @@ def rnnt_loss(
     blank=0,
     name=None,
 ):
-    if use_warprnnt:
-        return rnnt_loss_warprnnt(
-            logits=logits, labels=labels, label_length=label_length, logit_length=logit_length, blank=blank
-        )
-    else:
-        return rnnt_loss_tf(
-            logits=logits,
-            labels=labels,
-            label_length=label_length,
-            logit_length=logit_length,
-            name=name,
-        )
-
-
-def rnnt_loss_warprnnt(
-    logits,
-    labels,
-    label_length,
-    logit_length,
-    blank=0,
-):
-    if not env_util.has_devices(["GPU", "TPU"]):
-        logits = tf.nn.log_softmax(logits)
-    loss = warp_rnnt_loss(
-        acts=tf.cast(logits, tf.float32),
-        label_lengths=tf.cast(label_length, tf.int32),
-        labels=tf.cast(labels, tf.int32),
-        input_lengths=tf.cast(logit_length, tf.int32),
-        blank_label=blank,
+    return rnnt_loss_tf(
+        logits=logits,
+        labels=labels,
+        label_length=label_length,
+        logit_length=logit_length,
+        name=name,
     )
-    return loss
 
 
 def nan_to_zero(
